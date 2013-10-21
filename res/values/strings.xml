@@ -3,6 +3,8 @@
 
     <string name="app_name">Trust Evaluation Android App</string>
     <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_list_contact_splitted">ListContactSplittedActivity</string>
+    <string name="development_env">Development Environment</string>
+    <string name="button_contacts">Contact list1</string>
 
 </resources>
