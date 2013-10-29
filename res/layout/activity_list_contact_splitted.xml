@@ -1,18 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:baselineAligned="false"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".ListContactSplittedActivity"
-    android:orientation="horizontal" >
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
 
-    <ListView android:layout_width="0dip"
-              android:id="@+id/contactList"
-              android:layout_height="wrap_content"
-              android:layout_weight="1" />
+    <fragment
+        android:id="@+id/localPhoneListFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalPhoneListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <fragment
+        android:id="@+id/localEmailListFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalEmailListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Facebook concerned fragments -->
+
+    <fragment
+        android:id="@+id/facebookSplashFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.FacebookSplashFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <fragment
+        android:id="@+id/facebookFriendListFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.FacebookFriendListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <fragment
+        android:id="@+id/facebookUserSettingsFragment"
+        android:name="com.facebook.widget.UserSettingsFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Twitter concerned fragments -->
+
+
+    <!-- Twitter concerned fragments -->
 
 </LinearLayout>
