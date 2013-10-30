@@ -5,8 +5,6 @@ import java.util.List;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
 
 import android.app.Activity;
 import android.content.ContentResolver;
