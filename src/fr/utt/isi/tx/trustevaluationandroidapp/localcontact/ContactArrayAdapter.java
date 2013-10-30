@@ -3,8 +3,6 @@ package fr.utt.isi.tx.trustevaluationandroidapp.localcontact;
 import java.util.List;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;

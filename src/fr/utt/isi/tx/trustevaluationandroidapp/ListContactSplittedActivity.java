@@ -237,13 +237,6 @@ public class ListContactSplittedActivity extends FragmentActivity {
 	}
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.list_contact_splitted, menu);
-		return true;
-	}
-
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.equals(settings)) {
 			showFragment(FACEBOOK_USER_SETTINGS_FRAGMENT, true);
