@@ -46,11 +46,11 @@ public class ListContactSplittedActivity extends FragmentActivity {
 	private static final int FACEBOOK_SPLASH_FRAGMENT = 2;
 	private static final int FACEBOOK_FRIEND_LIST_FRAGMENT = 3;
 	private static final int FACEBOOK_USER_SETTINGS_FRAGMENT = 4;
-	// private static final int TWITTER_FOLLOW_LIST_FRAGMENT = 5;
+	private static final int TWITTER_FRIEND_LIST_FRAGMENT = 5;
 	// private static final int LINKEDIN_CONTACT_LIST_FRAGMENT = 6;
 
 	// number of fragments
-	private static final int FRAGMENT_COUNT = 5;
+	private static final int FRAGMENT_COUNT = 6;
 
 	// fragment array
 	private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
@@ -71,7 +71,8 @@ public class ListContactSplittedActivity extends FragmentActivity {
 
 	private void onSessionStateChange(Session session, SessionState state,
 			Exception exception) {
-		// only make changes if the activity is visible and the facebook contacts are currently involved
+		// only make changes if the activity is visible and the facebook
+		// contacts are currently involved
 		if (isResumed && contactType == FACEBOOK) {
 			Log.v(TAG, "session state changed");
 			FragmentManager manager = getSupportFragmentManager();
@@ -148,8 +149,8 @@ public class ListContactSplittedActivity extends FragmentActivity {
 				.findFragmentById(R.id.facebookFriendListFragment);
 		fragments[FACEBOOK_USER_SETTINGS_FRAGMENT] = fm
 				.findFragmentById(R.id.facebookUserSettingsFragment);
-		// fragments[TWITTER_FOLLOW_LIST_FRAGMENT] =
-		// fm.findFragmentById(R.id.facebookFriendListFragment);
+		fragments[TWITTER_FRIEND_LIST_FRAGMENT] = fm
+				.findFragmentById(R.id.twitterFriendListFragment);
 		// fragments[LINKEDIN_CONTACT_LIST_FRAGMENT] =
 		// fm.findFragmentById(R.id.facebookFriendListFragment);
 		Log.v(TAG, "fragments assigned");
@@ -191,7 +192,7 @@ public class ListContactSplittedActivity extends FragmentActivity {
 		// contacts from twitter
 		case TWITTER:
 			// TODO
-			// showFragment(TWITTER_FOLLOW_LIST_FRAGMENT, false);
+			showFragment(TWITTER_FRIEND_LIST_FRAGMENT, false);
 			break;
 
 		// contacts from linkedin
