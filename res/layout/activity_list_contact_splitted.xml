@@ -37,7 +37,11 @@
         android:layout_height="match_parent" />
 
     <!-- Twitter concerned fragments -->
-
+    <fragment
+        android:id="@+id/twitterFriendListFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.twittercontact.TwitterFriendListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
     <!-- Twitter concerned fragments -->
 

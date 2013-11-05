@@ -54,8 +54,8 @@ public class MainActivity extends Activity {
 	public void getTwitterContacts(View view) {
 		Intent intentToListContactSplitted = new Intent(this,
 				ListContactSplittedActivity.class);
-		// intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-		// ListContactSplittedActivity.TWITTER);
+		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
+				ListContactSplittedActivity.TWITTER);
 		startActivity(intentToListContactSplitted);
 	}
 
