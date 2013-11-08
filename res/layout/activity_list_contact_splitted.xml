@@ -39,10 +39,15 @@
     <!-- Twitter concerned fragments -->
     <fragment
         android:id="@+id/twitterFriendListFragment"
-        android:name="fr.utt.isi.tx.trustevaluationandroidapp.twittercontact.TwitterFriendListFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.twittercontact.TwitterFriendListFragment2"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- Twitter concerned fragments -->
+    <!-- Linkedin concerned fragments -->
+    <fragment
+        android:id="@+id/linkedinContactListFragment"
+        android:name="fr.utt.isi.tx.trustevaluationandroidapp.linkedincontact.LinkedinContactListFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
 
 </LinearLayout>

@@ -38,7 +38,7 @@ public class ListContactSplittedActivity extends FragmentActivity {
 	public static final int LINKEDIN = 4;
 
 	// contact type
-	private int contactType = FACEBOOK;
+	public static int contactType;
 
 	// fragment array index
 	private static final int LOCAL_PHONE_LIST_FRAGMENT = 0;
@@ -47,10 +47,10 @@ public class ListContactSplittedActivity extends FragmentActivity {
 	private static final int FACEBOOK_FRIEND_LIST_FRAGMENT = 3;
 	private static final int FACEBOOK_USER_SETTINGS_FRAGMENT = 4;
 	private static final int TWITTER_FRIEND_LIST_FRAGMENT = 5;
-	// private static final int LINKEDIN_CONTACT_LIST_FRAGMENT = 6;
+	private static final int LINKEDIN_CONTACT_LIST_FRAGMENT = 6;
 
 	// number of fragments
-	private static final int FRAGMENT_COUNT = 6;
+	private static final int FRAGMENT_COUNT = 7;
 
 	// fragment array
 	private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
@@ -151,8 +151,8 @@ public class ListContactSplittedActivity extends FragmentActivity {
 				.findFragmentById(R.id.facebookUserSettingsFragment);
 		fragments[TWITTER_FRIEND_LIST_FRAGMENT] = fm
 				.findFragmentById(R.id.twitterFriendListFragment);
-		// fragments[LINKEDIN_CONTACT_LIST_FRAGMENT] =
-		// fm.findFragmentById(R.id.facebookFriendListFragment);
+		fragments[LINKEDIN_CONTACT_LIST_FRAGMENT] = fm
+				.findFragmentById(R.id.linkedinContactListFragment);
 		Log.v(TAG, "fragments assigned");
 
 		// hide the fragments except local contact list fragment
@@ -198,7 +198,7 @@ public class ListContactSplittedActivity extends FragmentActivity {
 		// contacts from linkedin
 		case LINKEDIN:
 			// TODO
-			// showFragment(LINKEDIN_CONTACT_LIST_FRAGMENT, false);
+			showFragment(LINKEDIN_CONTACT_LIST_FRAGMENT, false);
 			break;
 
 		}

@@ -144,7 +144,7 @@ public class TwitterFriendListFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-
+								requestToken = null;
 							}
 						});
 
