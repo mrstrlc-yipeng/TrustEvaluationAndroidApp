@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -24,6 +25,9 @@ public abstract class LocalContactListFragment extends Fragment {
 
 	private static final String TAG = "LocalContactListFragment";
 
+	// database helper
+	private static TrustEvaluationDbHelper mDbHelper = null;
+
 	// context
 	private Context context;
 
@@ -42,26 +46,51 @@ public abstract class LocalContactListFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		super.onCreateView(inflater, container, savedInstanceState);
-		Log.v(TAG, "creating view...");
 		View view = inflater.inflate(R.layout.fragment_local_contact_list,
 				container, false);
 
 		// obtain contact list view object
 		contactListView = (ListView) view.findViewById(R.id.local_contact_list);
-		Log.v(TAG, "list view obtained");
 
 		// set adapter
-		contactListView
-				.setAdapter(new ContactArrayAdapter(context,
-						R.layout.local_contact_list,
-						getLocalContacts(getContactType())));
-		Log.v(TAG, "adapter set");
+		contactListView.setAdapter(new ContactArrayAdapter(context,
+				R.layout.local_contact_list, getLocalContacts(getContactType(),
+						false)));
 
 		return view;
 	}
 
-	protected List<ContactUser> getLocalContacts(int contactType) {
-		ArrayList<ContactUser> names = new ArrayList<ContactUser>();
+	protected List<ContactUser> getLocalContacts(int contactType,
+			boolean isForUpdate) {
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+
+		List<ContactUser> contacts = new ArrayList<ContactUser>();
+
+		if (!isForUpdate) {
+			// try to get contact list from database directly
+			contacts = (ArrayList<ContactUser>) mDbHelper.getLocalContacts(
+					contactType, null);
+			if (contacts != null) {
+				return contacts;
+			}
+		}
+
+		// get contacts from device
+		contacts = (ArrayList<ContactUser>) getLocalContactsFromDevice(contactType);
+		// update database
+		updateDatabase(contactType, contacts);
+
+		return contacts;
+	}
+
+	protected List<ContactUser> getLocalContactsFromDevice(int contactType) {
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		
+		List<ContactUser> contacts = new ArrayList<ContactUser>();
 		ContentResolver cr = context.getContentResolver();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
 				null, null, null);
@@ -85,11 +114,18 @@ public abstract class LocalContactListFragment extends Fragment {
 				Cursor cursor2 = cr.query(subUri, null, selection,
 						new String[] { id }, null);
 				while (cursor2.moveToNext()) {
-					// to get the contact names
+					// get the contact id in device
+					String contactId = cursor2
+							.getString(cursor2
+									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+
+					// get the contact names
 					String name = cursor2
 							.getString(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
 
+					// get the contact detail info (phone number or email
+					// address)
 					String contactDetail;
 					if (contactType == ListContactSplittedActivity.LOCAL_PHONE) {
 						contactDetail = cursor2
@@ -100,14 +136,52 @@ public abstract class LocalContactListFragment extends Fragment {
 								.getString(cursor2
 										.getColumnIndex(ContactsContract.CommonDataKinds.Email.DATA));
 					}
+
+					// set up contact list
 					if (contactDetail != null) {
-						names.add(new ContactUser(name, contactDetail));
+						ContactUser contact = new ContactUser(contactId, name,
+								contactDetail);
+
+						// check at here whether this contact has already been
+						// inserted into database
+						contact.setInsertedInDatabase(mDbHelper
+								.isContactInserted(contactType, contactId));
+						contacts.add(contact);
 					}
+
 				}
 				cursor2.close();
 			}
 		}
-		return names;
+
+		return contacts;
+	}
+
+	public void updateDatabase() {
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		
+		List<ContactUser> phoneContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_PHONE);
+		updateDatabase(ListContactSplittedActivity.LOCAL_PHONE, phoneContacts);
+		List<ContactUser> emailContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_EMAIL);
+		updateDatabase(ListContactSplittedActivity.LOCAL_EMAIL, emailContacts);
+	}
+
+	public void updateDatabase(int contactType) {
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		
+		List<ContactUser> contacts = getLocalContactsFromDevice(contactType);
+		updateDatabase(contactType, contacts);
+	}
+
+	public void updateDatabase(int contactType, List<ContactUser> contacts) {
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		mDbHelper.insertLocalContact(contactType, contacts);
 	}
 
 	public Context getContext() {
