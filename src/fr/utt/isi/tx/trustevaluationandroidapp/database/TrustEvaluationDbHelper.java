@@ -9,6 +9,7 @@ import org.brickred.socialauth.Contact;
 import com.facebook.model.GraphUser;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.PseudoFacebookGraphUser;
 import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalContact;
 import android.content.Context;
 import android.database.Cursor;
@@ -205,8 +206,8 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<Contact> i = contacts.iterator();
 		while (i.hasNext()) {
 			Contact contact = i.next();
-			if (!isContactInserted(
-					ListContactSplittedActivity.TWITTER, contact.getId())) {
+			if (!isContactInserted(ListContactSplittedActivity.TWITTER,
+					contact.getId())) {
 				statement.clearBindings();
 				statement.bindString(2, contact.getId());
 				// real display name
@@ -253,7 +254,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		return contacts;
 	}
-	
+
 	public void insertLinkedinContact(List<Contact> contacts) {
 		if (writable == null) {
 			writable = this.getWritableDatabase();
@@ -268,8 +269,8 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<Contact> i = contacts.iterator();
 		while (i.hasNext()) {
 			Contact contact = i.next();
-			if (!isContactInserted(
-					ListContactSplittedActivity.LINKEDIN, contact.getId())) {
+			if (!isContactInserted(ListContactSplittedActivity.LINKEDIN,
+					contact.getId())) {
 				statement.clearBindings();
 				statement.bindString(2, contact.getId());
 				statement.bindString(3, contact.getFirstName());
@@ -319,7 +320,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		return contacts;
 	}
-	
+
 	public void insertFacebookContacts(List<GraphUser> contacts) {
 		if (writable == null) {
 			writable = this.getWritableDatabase();
@@ -334,8 +335,8 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<GraphUser> i = contacts.iterator();
 		while (i.hasNext()) {
 			GraphUser contact = i.next();
-			if (!isContactInserted(
-					ListContactSplittedActivity.FACEBOOK, contact.getId())) {
+			if (!isContactInserted(ListContactSplittedActivity.FACEBOOK,
+					contact.getId())) {
 				statement.clearBindings();
 				statement.bindString(2, contact.getId());
 				statement.bindString(3, contact.getName());
@@ -348,13 +349,13 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
 	}
-	/*
-	public List<GraphUser> getFacebookContacts(String sortOrder) {
+
+	public List<PseudoFacebookGraphUser> getFacebookContacts(String sortOrder) {
 		if (readable == null) {
 			readable = this.getReadableDatabase();
 		}
 
-		List<GraphUser> contacts = new ArrayList<GraphUser>();
+		List<PseudoFacebookGraphUser> contacts = new ArrayList<PseudoFacebookGraphUser>();
 		Cursor c = readable.query(
 				TrustEvaluationDataContract.FacebookContact.TABLE_NAME, null,
 				null, null, null, null, sortOrder);
@@ -362,20 +363,16 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			contacts = null;
 		} else {
 			while (c.moveToNext()) {
-				GraphUser contact = new GraphUser();
-				contact.setId(c.getString(c
-						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_ID)));
-				contact.setFirstName(c.getString(c
-						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_FIRST_NAME)));
-				contact.setLastName(c.getString(c
-						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_LAST_NAME)));
-				contact.setProfileImageURL(c.getString(c
-						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL)));
+				PseudoFacebookGraphUser contact = new PseudoFacebookGraphUser(
+						c.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID)),
+						c.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_NAME)));
 				contacts.add(contact);
 			}
 		}
 
 		return contacts;
 	}
-*/
+
 }

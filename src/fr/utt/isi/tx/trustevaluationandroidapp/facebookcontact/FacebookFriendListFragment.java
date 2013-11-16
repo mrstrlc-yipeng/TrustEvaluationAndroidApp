@@ -101,6 +101,24 @@ public class FacebookFriendListFragment extends Fragment {
 			// Request friend list data
 			loginButtonView.setVisibility(View.GONE);
 			friendListView.setVisibility(View.VISIBLE);
+
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			
+			// try getting friend list from database
+			List<PseudoFacebookGraphUser> contacts = mDbHelper
+					.getFacebookContacts(null);
+			if (contacts != null) {
+				Log.v(TAG, "facebook contacts from db.");
+				friendListView
+						.setAdapter(new PseudoFacebookGraphUserListAdapter(
+								getActivity(), R.layout.facebook_friend_list,
+								contacts));
+				return;
+			}
+
+			// get friend list from remote request
 			makeNewMyFriendRequest(session);
 		} else {
 			// Show login button
@@ -210,6 +228,42 @@ public class FacebookFriendListFragment extends Fragment {
 			return view;
 		}
 
+	}
+
+	private class PseudoFacebookGraphUserListAdapter extends
+			ArrayAdapter<PseudoFacebookGraphUser> {
+		private static final String TAG = "PseudoFacebookGraphUserListAdapter";
+
+		private List<PseudoFacebookGraphUser> listElements;
+
+		public PseudoFacebookGraphUserListAdapter(Context context,
+				int resource, List<PseudoFacebookGraphUser> listElements) {
+			super(context, resource, listElements);
+			this.listElements = listElements;
+			Log.v(TAG, "list elements ok.");
+		}
+
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = convertView;
+			if (view == null) {
+				LayoutInflater inflater = (LayoutInflater) getActivity()
+						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				view = inflater.inflate(R.layout.facebook_friend_list, null);
+			}
+
+			PseudoFacebookGraphUser listElement = listElements.get(position);
+			if (listElement != null) {
+				profilePictureView = (ProfilePictureView) view
+						.findViewById(R.id.friend_list_profile_pic);
+				profilePictureView.setCropped(true);
+				userNameView = (TextView) view
+						.findViewById(R.id.friend_list_user_name);
+
+				profilePictureView.setProfileId(listElement.getId());
+				userNameView.setText(listElement.getName());
+			}
+			return view;
+		}
 	}
 
 }

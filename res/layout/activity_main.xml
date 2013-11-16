@@ -22,34 +22,11 @@
         android:orientation="vertical" >
 
         <Button
+            android:id="@+id/button_list_1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:onClick="getLocalPhoneContacts"
-            android:text="@string/button_local_contacts_phone" />
+            android:text="@string/button_list_1" />
 
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="getLocalEmailContacts"
-            android:text="@string/button_local_contacts_email" />
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="getFacebookContacts"
-            android:text="@string/button_facebook_contacts" />
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="getTwitterContacts"
-            android:text="@string/button_twitter_contacts" />
-
-        <Button
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:onClick="getLinkedinContacts"
-            android:text="@string/button_linkedin_contacts" />
     </LinearLayout>
 
 </LinearLayout>

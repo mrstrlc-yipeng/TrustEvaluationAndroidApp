@@ -6,8 +6,10 @@ import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
 
 	private static final String TAG = "MainActivity";
 
@@ -18,6 +20,9 @@ public class MainActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		Log.v(TAG, "creating activity...");
 		setContentView(R.layout.activity_main);
+		
+		Button button_list_1 = (Button) findViewById(R.id.button_list_1);
+		button_list_1.setOnClickListener(this);
 	}
 
 	@Override
@@ -27,44 +32,15 @@ public class MainActivity extends Activity {
 		return true;
 	}
 
-	public void getLocalPhoneContacts(View view) {
-		Intent intentToListContactSplitted = new Intent(this,
-				ListContactSplittedActivity.class);
-		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-				ListContactSplittedActivity.LOCAL_PHONE);
-		startActivity(intentToListContactSplitted);
-	}
-
-	public void getLocalEmailContacts(View view) {
-		Intent intentToListContactSplitted = new Intent(this,
-				ListContactSplittedActivity.class);
-		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-				ListContactSplittedActivity.LOCAL_EMAIL);
-		startActivity(intentToListContactSplitted);
-	}
-
-	public void getFacebookContacts(View view) {
-		Intent intentToListContactSplitted = new Intent(this,
-				ListContactSplittedActivity.class);
-		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-				ListContactSplittedActivity.FACEBOOK);
-		startActivity(intentToListContactSplitted);
-	}
-
-	public void getTwitterContacts(View view) {
-		Intent intentToListContactSplitted = new Intent(this,
-				ListContactSplittedActivity.class);
-		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-				ListContactSplittedActivity.TWITTER);
-		startActivity(intentToListContactSplitted);
-	}
-
-	public void getLinkedinContacts(View view) {
-		Intent intentToListContactSplitted = new Intent(this,
-				ListContactSplittedActivity.class);
-		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-				ListContactSplittedActivity.LINKEDIN);
-		startActivity(intentToListContactSplitted);
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.button_list_1:
+			startActivity(new Intent(this, ListContactSplittedActivity.class));
+			break;
+		default:
+			break;
+		}
 	}
 
 }
