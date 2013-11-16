@@ -4,28 +4,29 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.FacebookFriendListFragment;
+import fr.utt.isi.tx.trustevaluationandroidapp.linkedincontact.LinkedinContactListFragment;
+import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalEmailListFragment;
+import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalPhoneListFragment;
+import fr.utt.isi.tx.trustevaluationandroidapp.twittercontact.TwitterFriendListFragment2;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBar.Tab;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 
-//import android.support.v7.app.ActionBarActivity;
-
-public class ListContactSplittedActivity extends FragmentActivity {
+public class ListContactSplittedActivity extends ActionBarActivity implements
+		ActionBar.TabListener {
 
 	// tag for log
 	public static final String TAG = "ListContactSplittedActivity";
-
-	// flag indicating whether the activity is visible
-	private boolean isResumed = false;
-
-	// setting menu
-	private MenuItem settings;
 
 	// key of contact type passed in bundles
 	public static final String KEY_CONTACT_TYPE = "contact_type";
@@ -43,75 +44,38 @@ public class ListContactSplittedActivity extends FragmentActivity {
 	// fragment array index
 	private static final int LOCAL_PHONE_LIST_FRAGMENT = 0;
 	private static final int LOCAL_EMAIL_LIST_FRAGMENT = 1;
-	private static final int FACEBOOK_SPLASH_FRAGMENT = 2;
-	private static final int FACEBOOK_FRIEND_LIST_FRAGMENT = 3;
-	private static final int FACEBOOK_USER_SETTINGS_FRAGMENT = 4;
-	private static final int TWITTER_FRIEND_LIST_FRAGMENT = 5;
-	private static final int LINKEDIN_CONTACT_LIST_FRAGMENT = 6;
+	private static final int FACEBOOK_FRIEND_LIST_FRAGMENT = 2;
+	private static final int TWITTER_FRIEND_LIST_FRAGMENT = 3;
+	private static final int LINKEDIN_CONTACT_LIST_FRAGMENT = 4;
+	private static final int FACEBOOK_USER_SETTINGS_FRAGMENT = 5;
 
 	// number of fragments
-	private static final int FRAGMENT_COUNT = 7;
+	private static final int FRAGMENT_COUNT = FACEBOOK_USER_SETTINGS_FRAGMENT + 1;
 
 	// fragment array
-	private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
+	//private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
 
-	/* facebook variables and methods */
-	// UiLifecycleHelper
+	// pager adapter
+	private ContactFragmentPagerAdapter mPagerAdapter;
+
+	// view pager
+	private ViewPager mViewPager;
+
+	/**
+	 * Facebook UiLifecycleHelper
+	 */
 	private UiLifecycleHelper uiHelper;
 
-	// session state change listener
+	/**
+	 * Facebook session state change listener
+	 */
 	private Session.StatusCallback callback = new Session.StatusCallback() {
 
 		@Override
 		public void call(Session session, SessionState state,
 				Exception exception) {
-			onSessionStateChange(session, state, exception);
 		}
 	};
-
-	private void onSessionStateChange(Session session, SessionState state,
-			Exception exception) {
-		// only make changes if the activity is visible and the facebook
-		// contacts are currently involved
-		if (isResumed && contactType == FACEBOOK) {
-			Log.v(TAG, "session state changed");
-			FragmentManager manager = getSupportFragmentManager();
-
-			// get the number of entries in the back stack
-			int backStackSize = manager.getBackStackEntryCount();
-
-			// clear back stack
-			for (int i = 0; i < backStackSize; i++) {
-				manager.popBackStack();
-			}
-
-			// show the right fragment depending on session state
-			if (state.isOpened()) {
-				showFragment(FACEBOOK_FRIEND_LIST_FRAGMENT, false);
-			} else if (state.isClosed()) {
-				showFragment(FACEBOOK_SPLASH_FRAGMENT, false);
-			}
-		}
-	}
-
-	/**
-	 * log in if necessary, otherwise show friend list
-	 */
-	private void checkFacebookLoginFlow() {
-		Session session = Session.getActiveSession();
-
-		if (session != null && session.isOpened()) {
-			// if the session is already open,
-			// try to show the selection fragment
-			Log.v(TAG, "Facebook logged in");
-			showFragment(FACEBOOK_FRIEND_LIST_FRAGMENT, false);
-		} else {
-			// otherwise present the splash screen
-			// and ask the person to login.
-			Log.v(TAG, "Facebook not logged in");
-			showFragment(FACEBOOK_SPLASH_FRAGMENT, false);
-		}
-	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -132,142 +96,72 @@ public class ListContactSplittedActivity extends FragmentActivity {
 
 		setContentView(R.layout.activity_list_contact_splitted);
 
-		// TODO: add progress bar
+		// create pager adapter
+		mPagerAdapter = new ContactFragmentPagerAdapter(
+				getSupportFragmentManager());
 
-		// TODO: add filter bar
+		// get action bar by support library
+		final ActionBar actionBar = getSupportActionBar();
 
-		// get fragments objects by fragment manager
-		Log.v(TAG, "assign fragments");
-		FragmentManager fm = getSupportFragmentManager();
-		fragments[LOCAL_PHONE_LIST_FRAGMENT] = fm
-				.findFragmentById(R.id.localPhoneListFragment);
-		fragments[LOCAL_EMAIL_LIST_FRAGMENT] = fm
-				.findFragmentById(R.id.localEmailListFragment);
-		fragments[FACEBOOK_SPLASH_FRAGMENT] = fm
-				.findFragmentById(R.id.facebookSplashFragment);
-		fragments[FACEBOOK_FRIEND_LIST_FRAGMENT] = fm
-				.findFragmentById(R.id.facebookFriendListFragment);
-		fragments[FACEBOOK_USER_SETTINGS_FRAGMENT] = fm
-				.findFragmentById(R.id.facebookUserSettingsFragment);
-		fragments[TWITTER_FRIEND_LIST_FRAGMENT] = fm
-				.findFragmentById(R.id.twitterFriendListFragment);
-		fragments[LINKEDIN_CONTACT_LIST_FRAGMENT] = fm
-				.findFragmentById(R.id.linkedinContactListFragment);
-		Log.v(TAG, "fragments assigned");
+		// set navigation mode to tab mode
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-		// hide the fragments except local contact list fragment
-		FragmentTransaction transaction = fm.beginTransaction();
-		for (int i = 0; i < fragments.length; i++) {
-			transaction.hide(fragments[i]);
-		}
-		transaction.commit();
+		actionBar.setDisplayShowHomeEnabled(true);
 
-		// populate contact list
-		Log.v(TAG, "populate contacts");
-		populateContactList(contactType);
-		Log.v(TAG, "population over");
-	}
+		// get view pager
+		mViewPager = (ViewPager) findViewById(R.id.pager);
 
-	private void populateContactList(int contactType) {
-		Log.v(TAG, "contact type: " + contactType);
-		switch (contactType) {
+		// set pager adapter to view pager
+		mViewPager.setAdapter(mPagerAdapter);
 
-		// contacts from phone number
-		case LOCAL_PHONE:
-			// show fragment
-			showFragment(LOCAL_PHONE_LIST_FRAGMENT, false);
-			break;
+		// set listener
+		mViewPager
+				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+					@Override
+					public void onPageSelected(int position) {
+						actionBar.setSelectedNavigationItem(position);
+					}
+				});
 
-		// contacts from email
-		case LOCAL_EMAIL:
-			// show fragment
-			showFragment(LOCAL_EMAIL_LIST_FRAGMENT, false);
-			break;
-
-		// contacts from facebook
-		case FACEBOOK:
-			checkFacebookLoginFlow();
-			break;
-
-		// contacts from twitter
-		case TWITTER:
-			// TODO
-			showFragment(TWITTER_FRIEND_LIST_FRAGMENT, false);
-			break;
-
-		// contacts from linkedin
-		case LINKEDIN:
-			// TODO
-			showFragment(LINKEDIN_CONTACT_LIST_FRAGMENT, false);
-			break;
-
-		}
-	}
-
-	private void showFragment(int fragmentIndex, boolean addToBackStack) {
-		Log.v(TAG, "show fragment " + fragmentIndex);
-		FragmentManager fm = getSupportFragmentManager();
-		FragmentTransaction transaction = fm.beginTransaction();
-
-		// show the fragment by index, and hide all others
-		for (int i = 0; i < fragments.length; i++) {
-			if (i == fragmentIndex) {
-				transaction.show(fragments[i]);
-			} else {
-				transaction.hide(fragments[i]);
-			}
-		}
-
-		transaction.commit();
-		Log.v(TAG, "fragment " + fragmentIndex + " shown");
+		// add tabs to action bar
+		actionBar.addTab(actionBar.newTab().setText("PhoneBook").setTag(LOCAL_PHONE)
+				.setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("EmailBook").setTag(LOCAL_EMAIL)
+				.setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("Facebook").setTag(FACEBOOK)
+				.setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("Twitter").setTag(TWITTER)
+				.setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("LinkedIn").setTag(LINKEDIN)
+				.setTabListener(this));
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
-		// only add the menu when the selection fragment is showing
-		if (fragments[FACEBOOK_FRIEND_LIST_FRAGMENT].isVisible()) {
-			if (menu.size() == 0) {
-				settings = menu.add(R.string.settings);
-			}
-			return true;
-		} else {
-			menu.clear();
-			settings = null;
-		}
-		return false;
+	public void onTabReselected(Tab tab, FragmentTransaction ft) {
+
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.equals(settings)) {
-			showFragment(FACEBOOK_USER_SETTINGS_FRAGMENT, true);
-			return true;
-		}
-		return false;
+	public void onTabSelected(Tab tab, FragmentTransaction ft) {
+		contactType = (Integer) tab.getTag();
+		mViewPager.setCurrentItem(tab.getPosition());
 	}
 
 	@Override
-	protected void onResumeFragments() {
-		super.onResumeFragments();
+	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
 
-		// if facebook concerned
-		if (contactType == FACEBOOK) {
-			checkFacebookLoginFlow();
-		}
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		uiHelper.onResume();
-		isResumed = true;
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		uiHelper.onPause();
-		isResumed = false;
 	}
 
 	@Override
@@ -277,15 +171,48 @@ public class ListContactSplittedActivity extends FragmentActivity {
 	}
 
 	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		uiHelper.onSaveInstanceState(outState);
+	}
+
+	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		Session.getActiveSession().onActivityResult(this, requestCode,
 				resultCode, data);
 	}
 
-	@Override
-	protected void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		uiHelper.onSaveInstanceState(outState);
+	public class ContactFragmentPagerAdapter extends FragmentStatePagerAdapter {
+
+		public ContactFragmentPagerAdapter(FragmentManager fm) {
+			super(fm);
+		}
+
+		@Override
+		public Fragment getItem(int fragmentIndex) {
+			Log.v("PagerAdapter", "fragment index: " + fragmentIndex);
+			switch (fragmentIndex) {
+			default:
+				return null;
+			case LOCAL_PHONE_LIST_FRAGMENT:
+				return new LocalPhoneListFragment();
+			case LOCAL_EMAIL_LIST_FRAGMENT:
+				return new LocalEmailListFragment();
+			case FACEBOOK_FRIEND_LIST_FRAGMENT:
+				return new FacebookFriendListFragment();
+			case TWITTER_FRIEND_LIST_FRAGMENT:
+				return new TwitterFriendListFragment2();
+			case LINKEDIN_CONTACT_LIST_FRAGMENT:
+				return new LinkedinContactListFragment();
+			}
+		}
+
+		@Override
+		public int getCount() {
+			return FRAGMENT_COUNT - 1;
+		}
+
 	}
+
 }

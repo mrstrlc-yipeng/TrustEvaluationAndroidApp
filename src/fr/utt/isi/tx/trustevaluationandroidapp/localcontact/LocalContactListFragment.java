@@ -53,24 +53,24 @@ public abstract class LocalContactListFragment extends Fragment {
 		contactListView = (ListView) view.findViewById(R.id.local_contact_list);
 
 		// set adapter
-		contactListView.setAdapter(new ContactArrayAdapter(context,
+		contactListView.setAdapter(new LocalContactArrayAdapter(context,
 				R.layout.local_contact_list, getLocalContacts(getContactType(),
 						false)));
 
 		return view;
 	}
 
-	protected List<ContactUser> getLocalContacts(int contactType,
+	protected List<LocalContact> getLocalContacts(int contactType,
 			boolean isForUpdate) {
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 
-		List<ContactUser> contacts = new ArrayList<ContactUser>();
+		List<LocalContact> contacts = new ArrayList<LocalContact>();
 
 		if (!isForUpdate) {
 			// try to get contact list from database directly
-			contacts = (ArrayList<ContactUser>) mDbHelper.getLocalContacts(
+			contacts = (ArrayList<LocalContact>) mDbHelper.getLocalContacts(
 					contactType, null);
 			if (contacts != null) {
 				return contacts;
@@ -78,19 +78,20 @@ public abstract class LocalContactListFragment extends Fragment {
 		}
 
 		// get contacts from device
-		contacts = (ArrayList<ContactUser>) getLocalContactsFromDevice(contactType);
+		contacts = (ArrayList<LocalContact>) getLocalContactsFromDevice(contactType);
 		// update database
+		Log.v(TAG, "updating database...");
 		updateDatabase(contactType, contacts);
 
 		return contacts;
 	}
 
-	protected List<ContactUser> getLocalContactsFromDevice(int contactType) {
+	protected List<LocalContact> getLocalContactsFromDevice(int contactType) {
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 		
-		List<ContactUser> contacts = new ArrayList<ContactUser>();
+		List<LocalContact> contacts = new ArrayList<LocalContact>();
 		ContentResolver cr = context.getContentResolver();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
 				null, null, null);
@@ -139,7 +140,7 @@ public abstract class LocalContactListFragment extends Fragment {
 
 					// set up contact list
 					if (contactDetail != null) {
-						ContactUser contact = new ContactUser(contactId, name,
+						LocalContact contact = new LocalContact(contactId, name,
 								contactDetail);
 
 						// check at here whether this contact has already been
@@ -162,9 +163,9 @@ public abstract class LocalContactListFragment extends Fragment {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 		
-		List<ContactUser> phoneContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_PHONE);
+		List<LocalContact> phoneContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_PHONE);
 		updateDatabase(ListContactSplittedActivity.LOCAL_PHONE, phoneContacts);
-		List<ContactUser> emailContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_EMAIL);
+		List<LocalContact> emailContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_EMAIL);
 		updateDatabase(ListContactSplittedActivity.LOCAL_EMAIL, emailContacts);
 	}
 
@@ -173,11 +174,11 @@ public abstract class LocalContactListFragment extends Fragment {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 		
-		List<ContactUser> contacts = getLocalContactsFromDevice(contactType);
+		List<LocalContact> contacts = getLocalContactsFromDevice(contactType);
 		updateDatabase(contactType, contacts);
 	}
 
-	public void updateDatabase(int contactType, List<ContactUser> contacts) {
+	public void updateDatabase(int contactType, List<LocalContact> contacts) {
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}

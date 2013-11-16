@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.brickred.socialauth.Contact;
+
+import com.facebook.model.GraphUser;
+
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.ContactUser;
+import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalContact;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,7 +22,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 2;
+	public static final int DATABASE_VERSION = 15;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
 	private static SQLiteDatabase readable = null;
@@ -32,6 +36,9 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(TrustEvaluationDataContract.LocalPhoneContact.SQL_CREATE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalEmailContact.SQL_CREATE_ENTRIES);
+		db.execSQL(TrustEvaluationDataContract.FacebookContact.SQL_CREATE_ENTRIES);
+		db.execSQL(TrustEvaluationDataContract.TwitterContact.SQL_CREATE_ENTRIES);
+		db.execSQL(TrustEvaluationDataContract.LinkedinContact.SQL_CREATE_ENTRIES);
 	}
 
 	@Override
@@ -111,7 +118,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		return isInserted;
 	}
 
-	public void insertLocalContact(int contactType, List<ContactUser> contacts) {
+	public void insertLocalContact(int contactType, List<LocalContact> contacts) {
 		if (writable == null) {
 			writable = this.getWritableDatabase();
 		}
@@ -129,9 +136,9 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
-		Iterator<ContactUser> i = contacts.iterator();
+		Iterator<LocalContact> i = contacts.iterator();
 		while (i.hasNext()) {
-			ContactUser contact = i.next();
+			LocalContact contact = i.next();
 			if (!contact.isInsertedInDatabase()) {
 				statement.clearBindings();
 				statement.bindString(2, contact.getContactId());
@@ -146,7 +153,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		writable.endTransaction();
 	}
 
-	public List<ContactUser> getLocalContacts(int contactType, String sortOrder) {
+	public List<LocalContact> getLocalContacts(int contactType, String sortOrder) {
 		if (readable == null) {
 			readable = this.getReadableDatabase();
 		}
@@ -167,21 +174,208 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			return null;
 		}
 
-		ArrayList<ContactUser> contacts = new ArrayList<ContactUser>();
+		List<LocalContact> contacts = new ArrayList<LocalContact>();
 		Cursor c = readable.query(tableName, null, null, null, null, null,
 				sortOrder);
 		if (c.getCount() == 0) {
 			contacts = null;
 		} else {
 			while (c.moveToNext()) {
-				contacts.add(new ContactUser(
-						c.getString(c.getColumnIndex(columnNames[0])), 
-						c.getString(c.getColumnIndex(columnNames[1])), 
-						c.getString(c.getColumnIndex(columnNames[2]))));
+				contacts.add(new LocalContact(c.getString(c
+						.getColumnIndex(columnNames[0])), c.getString(c
+						.getColumnIndex(columnNames[1])), c.getString(c
+						.getColumnIndex(columnNames[2]))));
 			}
 		}
 
 		return contacts;
 	}
 
+	public void insertTwitterContact(List<Contact> contacts) {
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+
+		String query = "INSERT INTO "
+				+ TrustEvaluationDataContract.TwitterContact.TABLE_NAME
+				+ " VALUES (?,?,?,?,?,?,?)";
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+
+		Iterator<Contact> i = contacts.iterator();
+		while (i.hasNext()) {
+			Contact contact = i.next();
+			if (!isContactInserted(
+					ListContactSplittedActivity.TWITTER, contact.getId())) {
+				statement.clearBindings();
+				statement.bindString(2, contact.getId());
+				// real display name
+				statement.bindString(3, contact.getFirstName());
+				// twitter user name
+				statement.bindString(4, contact.getDisplayName());
+				// profile image url
+				statement.bindString(5, contact.getProfileImageURL());
+				statement.bindNull(6);
+				statement.bindLong(7, 0);
+				statement.execute();
+			}
+		}
+
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
+	}
+
+	public List<Contact> getTwitterContacts(String sortOrder) {
+		if (readable == null) {
+			readable = this.getReadableDatabase();
+		}
+
+		List<Contact> contacts = new ArrayList<Contact>();
+		Cursor c = readable.query(
+				TrustEvaluationDataContract.TwitterContact.TABLE_NAME, null,
+				null, null, null, null, sortOrder);
+		if (c.getCount() == 0) {
+			contacts = null;
+		} else {
+			while (c.moveToNext()) {
+				Contact contact = new Contact();
+				contact.setId(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_ID)));
+				contact.setFirstName(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_NAME)));
+				contact.setDisplayName(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_USERNAME)));
+				contact.setProfileImageURL(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_PROFILE_IMAGE_URL)));
+				contacts.add(contact);
+			}
+		}
+
+		return contacts;
+	}
+	
+	public void insertLinkedinContact(List<Contact> contacts) {
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+
+		String query = "INSERT INTO "
+				+ TrustEvaluationDataContract.LinkedinContact.TABLE_NAME
+				+ " VALUES (?,?,?,?,?,?,?)";
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+
+		Iterator<Contact> i = contacts.iterator();
+		while (i.hasNext()) {
+			Contact contact = i.next();
+			if (!isContactInserted(
+					ListContactSplittedActivity.LINKEDIN, contact.getId())) {
+				statement.clearBindings();
+				statement.bindString(2, contact.getId());
+				statement.bindString(3, contact.getFirstName());
+				statement.bindString(4, contact.getLastName());
+				// profile image url
+				String url = contact.getProfileImageURL();
+				if (url == null) {
+					statement.bindNull(5);
+				} else {
+					statement.bindString(5, contact.getProfileImageURL());
+				}
+				statement.bindNull(6);
+				statement.bindLong(7, 0);
+				statement.execute();
+			}
+		}
+
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
+	}
+
+	public List<Contact> getLinkedinContacts(String sortOrder) {
+		if (readable == null) {
+			readable = this.getReadableDatabase();
+		}
+
+		List<Contact> contacts = new ArrayList<Contact>();
+		Cursor c = readable.query(
+				TrustEvaluationDataContract.LinkedinContact.TABLE_NAME, null,
+				null, null, null, null, sortOrder);
+		if (c.getCount() == 0) {
+			contacts = null;
+		} else {
+			while (c.moveToNext()) {
+				Contact contact = new Contact();
+				contact.setId(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_ID)));
+				contact.setFirstName(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_FIRST_NAME)));
+				contact.setLastName(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_LAST_NAME)));
+				contact.setProfileImageURL(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL)));
+				contacts.add(contact);
+			}
+		}
+
+		return contacts;
+	}
+	
+	public void insertFacebookContacts(List<GraphUser> contacts) {
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+
+		String query = "INSERT INTO "
+				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
+				+ " VALUES (?,?,?,?,?)";
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+
+		Iterator<GraphUser> i = contacts.iterator();
+		while (i.hasNext()) {
+			GraphUser contact = i.next();
+			if (!isContactInserted(
+					ListContactSplittedActivity.FACEBOOK, contact.getId())) {
+				statement.clearBindings();
+				statement.bindString(2, contact.getId());
+				statement.bindString(3, contact.getName());
+				statement.bindNull(4);
+				statement.bindLong(5, 0);
+				statement.execute();
+			}
+		}
+
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
+	}
+	/*
+	public List<GraphUser> getFacebookContacts(String sortOrder) {
+		if (readable == null) {
+			readable = this.getReadableDatabase();
+		}
+
+		List<GraphUser> contacts = new ArrayList<GraphUser>();
+		Cursor c = readable.query(
+				TrustEvaluationDataContract.FacebookContact.TABLE_NAME, null,
+				null, null, null, null, sortOrder);
+		if (c.getCount() == 0) {
+			contacts = null;
+		} else {
+			while (c.moveToNext()) {
+				GraphUser contact = new GraphUser();
+				contact.setId(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_ID)));
+				contact.setFirstName(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_FIRST_NAME)));
+				contact.setLastName(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_LAST_NAME)));
+				contact.setProfileImageURL(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL)));
+				contacts.add(contact);
+			}
+		}
+
+		return contacts;
+	}
+*/
 }

@@ -120,8 +120,6 @@ public final class TrustEvaluationDataContract {
 		public static final String TABLE_NAME = "facebook_contact";
 		public static final String COLUMN_NAME_FACEBOOK_ID = "facebook_id";
 		public static final String COLUMN_NAME_FACEBOOK_NAME = "facebook_name";
-		public static final String COLUMN_NAME_FACEBOOK_EMAIL = "facebook_email";
-		public static final String COLUMN_NAME_FACEBOOK_PHONE = "facebook_phone";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
 		
@@ -135,12 +133,6 @@ public final class TrustEvaluationDataContract {
 				+ " INTERGER"
 				+ COMMA_SEP
 				+ COLUMN_NAME_FACEBOOK_NAME
-				+ " TEXT"
-				+ COMMA_SEP
-				+ COLUMN_NAME_FACEBOOK_EMAIL
-				+ " TEXT"
-				+ COMMA_SEP
-				+ COLUMN_NAME_FACEBOOK_PHONE
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID
@@ -157,8 +149,7 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_TWITTER_ID = "twitter_id";
 		public static final String COLUMN_NAME_TWITTER_NAME = "twitter_name";
 		public static final String COLUMN_NAME_TWITTER_USERNAME = "twitter_username";
-		public static final String COLUMN_NAME_TWITTER_EMAIL = "twitter_email";
-		public static final String COLUMN_NAME_TWITTER_PHONE = "twitter_phone";
+		public static final String COLUMN_NAME_TWITTER_PROFILE_IMAGE_URL = "twitter_profile_image_url";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
 		
@@ -169,7 +160,7 @@ public final class TrustEvaluationDataContract {
 				+ " INTEGER PRIMARY KEY"
 				+ COMMA_SEP
 				+ COLUMN_NAME_TWITTER_ID
-				+ " INTERGER"
+				+ " INTEGER"
 				+ COMMA_SEP
 				+ COLUMN_NAME_TWITTER_NAME
 				+ " TEXT"
@@ -177,10 +168,7 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_TWITTER_USERNAME
 				+ " TEXT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_TWITTER_EMAIL
-				+ " TEXT"
-				+ COMMA_SEP
-				+ COLUMN_NAME_TWITTER_PHONE
+				+ COLUMN_NAME_TWITTER_PROFILE_IMAGE_URL
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID
@@ -195,9 +183,9 @@ public final class TrustEvaluationDataContract {
 	public static abstract class LinkedinContact implements BaseColumns {
 		public static final String TABLE_NAME = "linkedin_contact";
 		public static final String COLUMN_NAME_LINKEDIN_ID = "linkedin_id";
-		public static final String COLUMN_NAME_LINKEDIN_NAME = "linkedin_name";
-		public static final String COLUMN_NAME_LINKEDIN_EMAIL = "linkedin_email";
-		public static final String COLUMN_NAME_LINKEDIN_PHONE = "linkedin_phone";
+		public static final String COLUMN_NAME_LINKEDIN_FIRST_NAME = "linkedin_first_name";
+		public static final String COLUMN_NAME_LINKEDIN_LAST_NAME = "linkedin_last_name";
+		public static final String COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL = "linkedin_profile_image_url";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
 		
@@ -210,13 +198,13 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_LINKEDIN_ID
 				+ " INTERGER"
 				+ COMMA_SEP
-				+ COLUMN_NAME_LINKEDIN_NAME
+				+ COLUMN_NAME_LINKEDIN_FIRST_NAME
 				+ " TEXT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_LINKEDIN_EMAIL
+				+ COLUMN_NAME_LINKEDIN_LAST_NAME
 				+ " TEXT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_LINKEDIN_PHONE
+				+ COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID

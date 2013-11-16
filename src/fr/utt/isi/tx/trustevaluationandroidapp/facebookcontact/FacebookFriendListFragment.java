@@ -11,8 +11,7 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
 import android.content.Context;
 import android.content.Intent;
@@ -31,6 +30,9 @@ public class FacebookFriendListFragment extends Fragment {
 	// tag for debug
 	private static final String TAG = "FacebookFriendListFragment";
 
+	// database helper
+	private static TrustEvaluationDbHelper mDbHelper = null;
+
 	// variables for user profile
 	private ProfilePictureView profilePictureView;
 	private TextView userNameView;
@@ -47,6 +49,9 @@ public class FacebookFriendListFragment extends Fragment {
 	};
 
 	private static final int REAUTH_ACTIVITY_CODE = 100;
+
+	// login button view
+	private com.facebook.widget.LoginButton loginButtonView;
 
 	// friend list view
 	private ListView friendListView;
@@ -67,66 +72,42 @@ public class FacebookFriendListFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_facebook_friend_list,
 				container, false);
 
-		// user's profile picture view
-		profilePictureView = (ProfilePictureView) view
-				.findViewById(R.id.facebook_profile_pic);
-		profilePictureView.setCropped(true);
-
-		// user's name view
-		userNameView = (TextView) view.findViewById(R.id.facebook_user_name);
+		// Login button view
+		loginButtonView = (com.facebook.widget.LoginButton) view
+				.findViewById(R.id.login_button);
+		loginButtonView.setVisibility(View.INVISIBLE);
 
 		// Friend list view
 		friendListView = (ListView) view
 				.findViewById(R.id.facebook_friend_list);
+		friendListView.setVisibility(View.INVISIBLE);
 
 		// check for an open session
-		Session session = Session.getActiveSession();
-		if (session != null && session.isOpened()) {
-			// get the user's data
-			makeMeRequest(session);
-			// get user's friends data
-			makeNewMyFriendRequest(session);
-		}
+		proceedBySession(Session.getActiveSession());
 
 		return view;
 	}
 
 	private void onSessionStateChange(final Session session,
 			SessionState state, Exception exception) {
-		if (session != null && session.isOpened()) {
-			// get the user's data
-			makeMeRequest(session);
-			// get user's friends data
-			makeNewMyFriendRequest(session);
-		}
+		Log.v(TAG, "Facebook session state changed");
+		proceedBySession(session);
 	}
 
-	// method to request user's data
-	private void makeMeRequest(final Session session) {
-		// Make an API call to get user data and define a new callback to handle
-		// the response.
-		Request request = Request.newMeRequest(session,
-				new Request.GraphUserCallback() {
-
-					@Override
-					public void onCompleted(GraphUser user, Response response) {
-						// If the response is successful
-						if (session == Session.getActiveSession()) {
-							if (user != null) {
-								// Set the id for the ProfilePictureView, view
-								// that in turn displays the profile picture.
-								profilePictureView.setProfileId(user.getId());
-								// Set the Textview's text to the user's name.
-								userNameView.setText(user.getName());
-								Log.v(TAG, "user name: " + user.getName());
-							}
-						}
-						if (response.getError() != null) {
-							// TODO: handle error
-						}
-					}
-				});
-		request.executeAsync();
+	private void proceedBySession(Session session) {
+		if (session != null && session.isOpened()) {
+			// Hide login button
+			// Show friend list
+			// Request friend list data
+			loginButtonView.setVisibility(View.GONE);
+			friendListView.setVisibility(View.VISIBLE);
+			makeNewMyFriendRequest(session);
+		} else {
+			// Show login button
+			// Hide friend list
+			loginButtonView.setVisibility(View.VISIBLE);
+			friendListView.setVisibility(View.INVISIBLE);
+		}
 	}
 
 	private void makeNewMyFriendRequest(final Session session) {
@@ -139,6 +120,13 @@ public class FacebookFriendListFragment extends Fragment {
 						// If the response is successful
 						if (session == Session.getActiveSession()) {
 							if (users != null) {
+								// database
+								if (mDbHelper == null) {
+									mDbHelper = new TrustEvaluationDbHelper(
+											getActivity());
+								}
+								mDbHelper.insertFacebookContacts(users);
+
 								// set adapter to list view
 								friendListView
 										.setAdapter(new GraphUserListAdapter(

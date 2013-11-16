@@ -4,42 +4,56 @@ import java.util.List;
 
 import org.brickred.customadapter.ImageLoader;
 import org.brickred.socialauth.Contact;
-import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
-import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class TwitterFriendListFragment2 extends Fragment {
+public class TwitterFriendListFragment2 extends Fragment implements
+		OnClickListener {
 
 	// Tag for debug
 	private static final String TAG = "TwitterFriendListFragment2";
 
+	// database helper
+	private static TrustEvaluationDbHelper mDbHelper = null;
+
+	// shared preferences
+	private static SharedPreferences mSharedPreferences;
+	private static final String PREF_NAME = "twitter_fragment_preferences";
+	private static final String PREF_IS_FIRST_VISIT = "is_first_visit";
+
+	// is first visit
+	private boolean isFirstVisit = true;
+
 	// adapter by socialAuth lib
 	private SocialAuthAdapter adapter;
 
-	// views
-	private ImageView profileImageView;
-	private TextView profileNameView;
+	// login button view
+	private Button loginButton;
+
+	// friend list view
 	private ListView friendList;
-	
-	private static ImageLoader imageLoader;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -47,8 +61,15 @@ public class TwitterFriendListFragment2 extends Fragment {
 
 		Log.v(TAG, "Creating fragment...");
 
+		// get shared preferences
+		mSharedPreferences = getActivity().getSharedPreferences(PREF_NAME,
+				Context.MODE_PRIVATE);
+
+		// get boolean "is_first_visit" from shared preferences
+		isFirstVisit = mSharedPreferences.getBoolean(PREF_IS_FIRST_VISIT, true);
+
+		// create SocialAuth adapter
 		adapter = new SocialAuthAdapter(new ResponseListener());
-		imageLoader = new ImageLoader(getActivity());
 	}
 
 	@Override
@@ -60,10 +81,13 @@ public class TwitterFriendListFragment2 extends Fragment {
 
 		Log.v(TAG, "Creating view...");
 
-		profileImageView = (ImageView) view
-				.findViewById(R.id.twitter_profile_pic);
-		profileNameView = (TextView) view.findViewById(R.id.twitter_user_name);
+		// get login button view
+		loginButton = (Button) view.findViewById(R.id.login_button);
+		loginButton.setOnClickListener(this);
+		// get friend list view
 		friendList = (ListView) view.findViewById(R.id.twitter_friend_list);
+
+		toggleView();
 
 		return view;
 	}
@@ -71,12 +95,49 @@ public class TwitterFriendListFragment2 extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (ListContactSplittedActivity.contactType == ListContactSplittedActivity.TWITTER) {
-			adapter = adapter == null ? new SocialAuthAdapter(
-					new ResponseListener()) : adapter;
+
+		// create db helper
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+
+		if (!isFirstVisit) {
+			// get contact list from database
+			List<Contact> contactList = mDbHelper.getTwitterContacts(null);
+			if (contactList != null) {
+				friendList.setAdapter(new TwitterContactAdapter(getActivity(),
+						R.layout.twitter_friend_list, contactList));
+				return;
+			}
+
+			if (adapter == null) {
+				adapter = new SocialAuthAdapter(new ResponseListener());
+			}
 			adapter.addCallBack(Provider.TWITTER,
 					"http://txtrustevaluation.easyredmine.com");
 			adapter.authorize(getActivity(), Provider.TWITTER);
+		}
+	}
+
+	@Override
+	public void onClick(View view) {
+		if (view.getId() == R.id.login_button) {
+			if (adapter == null) {
+				adapter = new SocialAuthAdapter(new ResponseListener());
+			}
+			adapter.addCallBack(Provider.TWITTER,
+					"http://txtrustevaluation.easyredmine.com");
+			adapter.authorize(getActivity(), Provider.TWITTER);
+		}
+	}
+
+	private void toggleView() {
+		if (isFirstVisit) {
+			loginButton.setVisibility(View.VISIBLE);
+			friendList.setVisibility(View.INVISIBLE);
+		} else {
+			loginButton.setVisibility(View.GONE);
+			friendList.setVisibility(View.VISIBLE);
 		}
 	}
 
@@ -84,8 +145,13 @@ public class TwitterFriendListFragment2 extends Fragment {
 
 		@Override
 		public void onComplete(Bundle values) {
-			// my user profile
-			adapter.getUserProfileAsync(new ProfileDataListener());
+			// set "is_first_visit" to false
+			isFirstVisit = false;
+			Editor e = mSharedPreferences.edit();
+			e.putBoolean(PREF_IS_FIRST_VISIT, isFirstVisit);
+			e.commit();
+
+			toggleView();
 
 			// contact list
 			adapter.getContactListAsync(new ContactDataListener());
@@ -109,35 +175,16 @@ public class TwitterFriendListFragment2 extends Fragment {
 		}
 	}
 
-	private final class ProfileDataListener implements
-			SocialAuthListener<Profile> {
-
-		@Override
-		public void onExecute(String provider, Profile t) {
-			// profile image
-			imageLoader.DisplayImage(t.getProfileImageURL(), profileImageView);
-			Log.v(TAG, "image url: " + t.getProfileImageURL());
-
-			// profile name
-			profileNameView.setText(t.getFullName());
-		}
-
-		@Override
-		public void onError(SocialAuthError e) {
-
-		}
-	}
-
 	private final class ContactDataListener implements
 			SocialAuthListener<List<Contact>> {
 
 		@Override
 		public void onExecute(String provider, List<Contact> t) {
-
 			Log.d(TAG, "Receiving Data");
 			List<Contact> contactsList = t;
 
 			if (contactsList != null && contactsList.size() > 0) {
+				mDbHelper.insertTwitterContact(contactsList);
 				friendList.setAdapter(new TwitterContactAdapter(getActivity(),
 						R.layout.twitter_friend_list, contactsList));
 			} else {
@@ -153,14 +200,14 @@ public class TwitterFriendListFragment2 extends Fragment {
 
 	private class TwitterContactAdapter extends ArrayAdapter<Contact> {
 		List<Contact> contacts;
-		//ImageLoader imageLoader;
+		ImageLoader imageLoader;
 
 		public TwitterContactAdapter(Context context, int textViewResourceId,
 				List<Contact> contacts) {
 			super(context, textViewResourceId);
 
 			this.contacts = contacts;
-			//imageLoader = new ImageLoader(context);
+			imageLoader = new ImageLoader(context);
 		}
 
 		@Override
@@ -186,8 +233,7 @@ public class TwitterFriendListFragment2 extends Fragment {
 
 				// profile full name
 				TextView t = (TextView) view.findViewById(R.id.contact_name);
-				t.setText(listElement.getDisplayName());
-				Log.v(TAG, "user name: " + listElement.getDisplayName());
+				t.setText(listElement.getFirstName());
 			}
 			Log.v(TAG, "element ok");
 
@@ -195,4 +241,5 @@ public class TwitterFriendListFragment2 extends Fragment {
 		}
 
 	}
+
 }

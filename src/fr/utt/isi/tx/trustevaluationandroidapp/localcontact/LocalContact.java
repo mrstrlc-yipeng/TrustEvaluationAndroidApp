@@ -2,7 +2,7 @@ package fr.utt.isi.tx.trustevaluationandroidapp.localcontact;
 
 import android.widget.BaseAdapter;
 
-public class ContactUser {
+public class LocalContact {
 	private String contactId;
 	
 	private String displayName;
@@ -13,7 +13,7 @@ public class ContactUser {
 
 	private BaseAdapter adapter;
 
-	public ContactUser(String contactId, String displayName, String contactDetail) {
+	public LocalContact(String contactId, String displayName, String contactDetail) {
 		super();
 		this.contactId = contactId;
 		this.displayName = displayName;
