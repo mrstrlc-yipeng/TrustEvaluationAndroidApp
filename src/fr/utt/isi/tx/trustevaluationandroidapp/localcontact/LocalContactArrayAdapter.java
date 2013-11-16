@@ -11,16 +11,16 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-public class ContactArrayAdapter extends ArrayAdapter<ContactUser> {
+public class LocalContactArrayAdapter extends ArrayAdapter<LocalContact> {
 
 	// context
 	private Context context;
 
 	// ContactUser list object
-	private List<ContactUser> contacts;
+	private List<LocalContact> contacts;
 
-	public ContactArrayAdapter(Context context, int resourceId,
-			List<ContactUser> contacts) {
+	public LocalContactArrayAdapter(Context context, int resourceId,
+			List<LocalContact> contacts) {
 		super(context, resourceId, contacts);
 		this.context = context;
 		this.contacts = contacts;
@@ -40,7 +40,7 @@ public class ContactArrayAdapter extends ArrayAdapter<ContactUser> {
 		}
 
 		// get object
-		ContactUser contact = contacts.get(position);
+		LocalContact contact = contacts.get(position);
 		if (contact != null) {
 			// text view to show display_name
 			TextView viewDisplayName = (TextView) view

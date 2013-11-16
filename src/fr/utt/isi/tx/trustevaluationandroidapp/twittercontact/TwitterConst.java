@@ -1,12 +1,13 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.twittercontact;
 
-public class Const {
+public class TwitterConst {
 	static final String SESSION_FILE_NAME = "twitter_connection.obj";
 	
 	static String CONSUMER_KEY = "xvsJhtNAcb6ZH8gZ8yoFw";
 	static String CONSUMER_SECRET = "rdpTxhcOGSMZ0G52YPPu1RzhsYbcJdIMZ2i25dnsnU";
 
 	static String PREFERENCE_NAME = "twitter_oauth";
+	static String PREF_IS_FIRST_VISIT = "is_first_visit";
 	static final String PREF_USER_ID = "user_id";
 	static final String PREF_KEY_SECRET = "oauth_token_secret";
 	static final String PREF_KEY_TOKEN = "oauth_token";

@@ -14,5 +14,7 @@
     <string name="button_facebook_contacts">Facebook contacts</string>
     <string name="button_twitter_contacts">Twitter contacts</string>
     <string name="button_linkedin_contacts">LinkedIn contacts</string>
+    <string name="twitter_login_button_text">Log in with Twitter</string>
+    <string name="linkedin_login_button_text">Log in with LinkedIn</string>
 
 </resources>

@@ -90,13 +90,10 @@ public class TwitterFriendListFragment extends Fragment {
 		// affect shared preference object
 		Log.v(TAG, "Loading preferences...");
 		mSharedPreferences = getActivity().getSharedPreferences(
-				Const.PREFERENCE_NAME, Context.MODE_PRIVATE);
+				TwitterConst.PREFERENCE_NAME, Context.MODE_PRIVATE);
 		Log.v(TAG, "Preferences loaded");
 		// affect views
 		Log.v(TAG, "Loading views...");
-		profileImageView = (ImageView) view
-				.findViewById(R.id.twitter_profile_pic);
-		profileNameView = (TextView) view.findViewById(R.id.twitter_user_name);
 		friendListView = (ListView) view.findViewById(R.id.twitter_friend_list);
 		Log.v(TAG, "Views loaded");
 
@@ -144,7 +141,7 @@ public class TwitterFriendListFragment extends Fragment {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-
+								requestToken = null;
 							}
 						});
 
@@ -156,7 +153,7 @@ public class TwitterFriendListFragment extends Fragment {
 	}
 
 	private boolean isConnected() {
-		return mSharedPreferences.getString(Const.PREF_KEY_TOKEN, null) != null;
+		return mSharedPreferences.getString(TwitterConst.PREF_KEY_TOKEN, null) != null;
 	}
 
 	/* TODO: add menu settings to process logout flow
@@ -174,7 +171,7 @@ public class TwitterFriendListFragment extends Fragment {
 	private void doSave(boolean isEmpty) {
 		try {
 			FileOutputStream fos = getActivity().openFileOutput(
-					Const.SESSION_FILE_NAME, Context.MODE_PRIVATE);
+					TwitterConst.SESSION_FILE_NAME, Context.MODE_PRIVATE);
 			ObjectOutputStream oos = new ObjectOutputStream(fos);
 			Log.v(TAG, "Saving access token object...");
 			if (isEmpty) {
@@ -196,7 +193,7 @@ public class TwitterFriendListFragment extends Fragment {
 	private void doLoad() {
 		try {
 			FileInputStream fis = getActivity().openFileInput(
-					Const.SESSION_FILE_NAME);
+					TwitterConst.SESSION_FILE_NAME);
 			ObjectInputStream ois = new ObjectInputStream(fis);
 			Log.v(TAG, "Loading access token object...");
 			accessToken = (AccessToken) ois.readObject();
@@ -205,8 +202,8 @@ public class TwitterFriendListFragment extends Fragment {
 				Log.v(TAG, "Recreating twitter object");
 				TwitterFactory tf = new TwitterFactory();
 				twitter = tf.getInstance();
-				twitter.setOAuthConsumer(Const.CONSUMER_KEY,
-						Const.CONSUMER_SECRET);
+				twitter.setOAuthConsumer(TwitterConst.CONSUMER_KEY,
+						TwitterConst.CONSUMER_SECRET);
 				twitter.setOAuthAccessToken(accessToken);
 				Log.v(TAG, "Twitter ok");
 			}
@@ -252,8 +249,8 @@ public class TwitterFriendListFragment extends Fragment {
 
 		protected void askRequestToken() {
 			ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-			configurationBuilder.setOAuthConsumerKey(Const.CONSUMER_KEY);
-			configurationBuilder.setOAuthConsumerSecret(Const.CONSUMER_SECRET);
+			configurationBuilder.setOAuthConsumerKey(TwitterConst.CONSUMER_KEY);
+			configurationBuilder.setOAuthConsumerSecret(TwitterConst.CONSUMER_SECRET);
 			Configuration configuration = configurationBuilder.build();
 			twitter = new TwitterFactory(configuration).getInstance();
 
@@ -297,9 +294,9 @@ public class TwitterFriendListFragment extends Fragment {
 
 		protected void postAccessToken() {
 			Editor e = mSharedPreferences.edit();
-			e.putLong(Const.PREF_USER_ID, userId);
-			e.putString(Const.PREF_KEY_TOKEN, accessToken.getToken());
-			e.putString(Const.PREF_KEY_SECRET, accessToken.getTokenSecret());
+			e.putLong(TwitterConst.PREF_USER_ID, userId);
+			e.putString(TwitterConst.PREF_KEY_TOKEN, accessToken.getToken());
+			e.putString(TwitterConst.PREF_KEY_SECRET, accessToken.getTokenSecret());
 			e.commit();
 			doSave(false);
 			onResume();

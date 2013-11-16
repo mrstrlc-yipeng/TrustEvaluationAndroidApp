@@ -1,48 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
-
-    <fragment
-        android:id="@+id/localPhoneListFragment"
-        android:name="fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalPhoneListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <fragment
-        android:id="@+id/localEmailListFragment"
-        android:name="fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalEmailListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Facebook concerned fragments -->
-
-    <fragment
-        android:id="@+id/facebookSplashFragment"
-        android:name="fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.FacebookSplashFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <fragment
-        android:id="@+id/facebookFriendListFragment"
-        android:name="fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.FacebookFriendListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <fragment
-        android:id="@+id/facebookUserSettingsFragment"
-        android:name="com.facebook.widget.UserSettingsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Twitter concerned fragments -->
-    <fragment
-        android:id="@+id/twitterFriendListFragment"
-        android:name="fr.utt.isi.tx.trustevaluationandroidapp.twittercontact.TwitterFriendListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Twitter concerned fragments -->
-
-</LinearLayout>
+<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/pager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" />

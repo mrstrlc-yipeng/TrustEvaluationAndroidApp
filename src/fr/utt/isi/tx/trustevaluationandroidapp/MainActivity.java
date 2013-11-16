@@ -62,8 +62,8 @@ public class MainActivity extends Activity {
 	public void getLinkedinContacts(View view) {
 		Intent intentToListContactSplitted = new Intent(this,
 				ListContactSplittedActivity.class);
-		// intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
-		// ListContactSplittedActivity.LINKEDIN);
+		intentToListContactSplitted.putExtra(EXTRA_CONTACT_TYPE,
+				ListContactSplittedActivity.LINKEDIN);
 		startActivity(intentToListContactSplitted);
 	}
 
