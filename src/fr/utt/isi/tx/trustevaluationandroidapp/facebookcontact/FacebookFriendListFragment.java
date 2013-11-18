@@ -20,12 +20,15 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class FacebookFriendListFragment extends Fragment {
+public class FacebookFriendListFragment extends Fragment implements
+		OnClickListener {
 
 	// tag for debug
 	private static final String TAG = "FacebookFriendListFragment";
@@ -56,6 +59,9 @@ public class FacebookFriendListFragment extends Fragment {
 	// friend list view
 	private ListView friendListView;
 
+	// update button view
+	private Button updateButtonView;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -82,8 +88,13 @@ public class FacebookFriendListFragment extends Fragment {
 				.findViewById(R.id.facebook_friend_list);
 		friendListView.setVisibility(View.INVISIBLE);
 
+		// Update button view
+		updateButtonView = (Button) view.findViewById(R.id.update_button);
+		updateButtonView.setOnClickListener(this);
+		updateButtonView.setVisibility(View.INVISIBLE);
+
 		// check for an open session
-		proceedBySession(Session.getActiveSession());
+		proceedBySession(Session.getActiveSession(), false);
 
 		return view;
 	}
@@ -91,31 +102,33 @@ public class FacebookFriendListFragment extends Fragment {
 	private void onSessionStateChange(final Session session,
 			SessionState state, Exception exception) {
 		Log.v(TAG, "Facebook session state changed");
-		proceedBySession(session);
+		proceedBySession(session, false);
 	}
 
-	private void proceedBySession(Session session) {
+	private void proceedBySession(Session session, boolean isForUpdate) {
 		if (session != null && session.isOpened()) {
 			// Hide login button
 			// Show friend list
 			// Request friend list data
 			loginButtonView.setVisibility(View.GONE);
 			friendListView.setVisibility(View.VISIBLE);
+			updateButtonView.setVisibility(View.VISIBLE);
 
 			if (mDbHelper == null) {
 				mDbHelper = new TrustEvaluationDbHelper(getActivity());
 			}
-			
+
 			// try getting friend list from database
-			List<PseudoFacebookGraphUser> contacts = mDbHelper
-					.getFacebookContacts(null);
-			if (contacts != null) {
-				Log.v(TAG, "facebook contacts from db.");
-				friendListView
-						.setAdapter(new PseudoFacebookGraphUserListAdapter(
-								getActivity(), R.layout.facebook_friend_list,
-								contacts));
-				return;
+			if (!isForUpdate) {
+				List<PseudoFacebookGraphUser> contacts = mDbHelper
+						.getFacebookContacts(null);
+				if (contacts != null) {
+					friendListView
+							.setAdapter(new PseudoFacebookGraphUserListAdapter(
+									getActivity(),
+									R.layout.facebook_friend_list, contacts));
+					return;
+				}
 			}
 
 			// get friend list from remote request
@@ -125,6 +138,7 @@ public class FacebookFriendListFragment extends Fragment {
 			// Hide friend list
 			loginButtonView.setVisibility(View.VISIBLE);
 			friendListView.setVisibility(View.INVISIBLE);
+			updateButtonView.setVisibility(View.INVISIBLE);
 		}
 	}
 
@@ -159,6 +173,17 @@ public class FacebookFriendListFragment extends Fragment {
 					}
 				});
 		request.executeAsync();
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.update_button:
+			proceedBySession(Session.getActiveSession(), true);
+			break;
+		default:
+			break;
+		}
 	}
 
 	@Override

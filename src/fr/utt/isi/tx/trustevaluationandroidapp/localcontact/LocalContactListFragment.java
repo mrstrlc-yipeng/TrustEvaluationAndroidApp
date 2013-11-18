@@ -18,10 +18,13 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 
-public abstract class LocalContactListFragment extends Fragment {
+public abstract class LocalContactListFragment extends Fragment implements
+		OnClickListener {
 
 	private static final String TAG = "LocalContactListFragment";
 
@@ -33,6 +36,9 @@ public abstract class LocalContactListFragment extends Fragment {
 
 	// contact list view
 	private ListView contactListView;
+
+	// contact update button view
+	private Button updateButtonView;
 
 	public abstract int getContactType();
 
@@ -49,7 +55,7 @@ public abstract class LocalContactListFragment extends Fragment {
 		View view = inflater.inflate(R.layout.fragment_local_contact_list,
 				container, false);
 
-		// obtain contact list view object
+		// get contact list view object
 		contactListView = (ListView) view.findViewById(R.id.local_contact_list);
 
 		// set adapter
@@ -57,7 +63,25 @@ public abstract class LocalContactListFragment extends Fragment {
 				R.layout.local_contact_list, getLocalContacts(getContactType(),
 						false)));
 
+		// get update button view object
+		updateButtonView = (Button) view.findViewById(R.id.update_button);
+		updateButtonView.setOnClickListener(this);
+
 		return view;
+	}
+
+	@Override
+	public void onClick(View view) {
+		
+		switch (view.getId()) {
+		case R.id.update_button:
+			contactListView.setAdapter(new LocalContactArrayAdapter(context,
+					R.layout.local_contact_list, getLocalContacts(
+							getContactType(), true)));
+			break;
+		default:
+			break;
+		}
 	}
 
 	protected List<LocalContact> getLocalContacts(int contactType,
@@ -82,7 +106,7 @@ public abstract class LocalContactListFragment extends Fragment {
 		// update database
 		Log.v(TAG, "updating database...");
 		updateDatabase(contactType, contacts);
-
+		
 		return contacts;
 	}
 
@@ -90,7 +114,7 @@ public abstract class LocalContactListFragment extends Fragment {
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
-		
+
 		List<LocalContact> contacts = new ArrayList<LocalContact>();
 		ContentResolver cr = context.getContentResolver();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
@@ -140,8 +164,8 @@ public abstract class LocalContactListFragment extends Fragment {
 
 					// set up contact list
 					if (contactDetail != null) {
-						LocalContact contact = new LocalContact(contactId, name,
-								contactDetail);
+						LocalContact contact = new LocalContact(contactId,
+								name, contactDetail);
 
 						// check at here whether this contact has already been
 						// inserted into database
@@ -154,6 +178,7 @@ public abstract class LocalContactListFragment extends Fragment {
 				cursor2.close();
 			}
 		}
+		cursor.close();
 
 		return contacts;
 	}
@@ -162,7 +187,7 @@ public abstract class LocalContactListFragment extends Fragment {
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
-		
+
 		List<LocalContact> phoneContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_PHONE);
 		updateDatabase(ListContactSplittedActivity.LOCAL_PHONE, phoneContacts);
 		List<LocalContact> emailContacts = getLocalContactsFromDevice(ListContactSplittedActivity.LOCAL_EMAIL);
@@ -173,7 +198,7 @@ public abstract class LocalContactListFragment extends Fragment {
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
-		
+
 		List<LocalContact> contacts = getLocalContactsFromDevice(contactType);
 		updateDatabase(contactType, contacts);
 	}
