@@ -12,5 +12,6 @@
     <string name="button_list_1">List 1</string>
     <string name="twitter_login_button_text">Log in with Twitter</string>
     <string name="linkedin_login_button_text">Log in with LinkedIn</string>
+    <string name="button_update">Update</string>
 
 </resources>

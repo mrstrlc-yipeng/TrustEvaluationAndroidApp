@@ -23,11 +23,11 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 15;
+	public static final int DATABASE_VERSION = 20;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
-	private static SQLiteDatabase readable = null;
-	private static SQLiteDatabase writable = null;
+	private SQLiteDatabase readable = null;
+	private SQLiteDatabase writable = null;
 
 	public TrustEvaluationDbHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -63,7 +63,6 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 
 		String tableName;
-		// selection clause
 		String selection;
 		switch (contactType) {
 		case ListContactSplittedActivity.LOCAL_PHONE:
@@ -112,8 +111,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			// rows found
 			isInserted = true;
 		}
-
-		// db.close();
+		c.close();
 
 		Log.v(TAG, "inserted? " + isInserted);
 		return isInserted;
@@ -188,6 +186,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 						.getColumnIndex(columnNames[2]))));
 			}
 		}
+		c.close();
 
 		return contacts;
 	}
@@ -251,6 +250,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				contacts.add(contact);
 			}
 		}
+		c.close();
 
 		return contacts;
 	}
@@ -317,6 +317,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				contacts.add(contact);
 			}
 		}
+		c.close();
 
 		return contacts;
 	}
@@ -371,6 +372,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				contacts.add(contact);
 			}
 		}
+		c.close();
 
 		return contacts;
 	}

@@ -55,6 +55,9 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	// friend list view
 	private ListView friendList;
 
+	// update button view
+	private Button updateButton;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -84,8 +87,13 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		// get login button view
 		loginButton = (Button) view.findViewById(R.id.login_button);
 		loginButton.setOnClickListener(this);
+
 		// get friend list view
 		friendList = (ListView) view.findViewById(R.id.twitter_friend_list);
+
+		// get update button view
+		updateButton = (Button) view.findViewById(R.id.update_button);
+		updateButton.setOnClickListener(this);
 
 		toggleView();
 
@@ -110,24 +118,21 @@ public class TwitterFriendListFragment2 extends Fragment implements
 				return;
 			}
 
-			if (adapter == null) {
-				adapter = new SocialAuthAdapter(new ResponseListener());
-			}
-			adapter.addCallBack(Provider.TWITTER,
-					"http://txtrustevaluation.easyredmine.com");
-			adapter.authorize(getActivity(), Provider.TWITTER);
+			proceed();
 		}
 	}
 
 	@Override
 	public void onClick(View view) {
-		if (view.getId() == R.id.login_button) {
-			if (adapter == null) {
-				adapter = new SocialAuthAdapter(new ResponseListener());
-			}
-			adapter.addCallBack(Provider.TWITTER,
-					"http://txtrustevaluation.easyredmine.com");
-			adapter.authorize(getActivity(), Provider.TWITTER);
+		switch (view.getId()) {
+		case R.id.login_button:
+			proceed();
+			break;
+		case R.id.update_button:
+			proceed();
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -135,10 +140,21 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		if (isFirstVisit) {
 			loginButton.setVisibility(View.VISIBLE);
 			friendList.setVisibility(View.INVISIBLE);
+			updateButton.setVisibility(View.INVISIBLE);
 		} else {
 			loginButton.setVisibility(View.GONE);
 			friendList.setVisibility(View.VISIBLE);
+			updateButton.setVisibility(View.VISIBLE);
 		}
+	}
+	
+	private void proceed() {
+		if (adapter == null) {
+			adapter = new SocialAuthAdapter(new ResponseListener());
+		}
+		adapter.addCallBack(Provider.TWITTER,
+				"http://txtrustevaluation.easyredmine.com");
+		adapter.authorize(getActivity(), Provider.TWITTER);
 	}
 
 	private final class ResponseListener implements DialogListener {

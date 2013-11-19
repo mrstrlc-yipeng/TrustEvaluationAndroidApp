@@ -1208,7 +1208,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f050016;
         public static final int action_menu_presenter=0x7f050017;
         public static final int action_mode_close_button=0x7f050026;
-        public static final int action_settings=0x7f050061;
+        public static final int action_settings=0x7f050062;
         public static final int activity_chooser_view_content=0x7f050027;
         public static final int always=0x7f05000b;
         public static final int beginning=0x7f050011;
@@ -1236,10 +1236,10 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_logo_image=0x7f050052;
         public static final int com_facebook_usersettingsfragment_profile_name=0x7f050053;
         public static final int contactEntryText=0x7f050055;
-        public static final int contact_detail=0x7f050060;
-        public static final int contact_display_name=0x7f05005f;
-        public static final int contact_image=0x7f05005d;
-        public static final int contact_name=0x7f05005e;
+        public static final int contact_detail=0x7f050061;
+        public static final int contact_display_name=0x7f050060;
+        public static final int contact_image=0x7f05005e;
+        public static final int contact_name=0x7f05005f;
         public static final int default_activity_button=0x7f05002a;
         public static final int dialog=0x7f05000e;
         public static final int disableHome=0x7f050008;
@@ -1257,10 +1257,10 @@ containing a value of this type.
         public static final int ifRoom=0x7f05000a;
         public static final int image=0x7f050029;
         public static final int large=0x7f05001b;
-        public static final int linkedin_friend_list=0x7f05005a;
+        public static final int linkedin_friend_list=0x7f05005b;
         public static final int listMode=0x7f050001;
         public static final int list_item=0x7f05002b;
-        public static final int local_contact_list=0x7f05005b;
+        public static final int local_contact_list=0x7f05005c;
         public static final int login_button=0x7f050058;
         public static final int middle=0x7f050012;
         public static final int never=0x7f050009;
@@ -1291,8 +1291,9 @@ containing a value of this type.
         public static final int tabMode=0x7f050002;
         public static final int title=0x7f05002d;
         public static final int top_action_bar=0x7f050022;
-        public static final int twitter_friend_list=0x7f05005c;
+        public static final int twitter_friend_list=0x7f05005d;
         public static final int up=0x7f050023;
+        public static final int update_button=0x7f05005a;
         public static final int useLogo=0x7f050003;
         public static final int withText=0x7f05000c;
     }
@@ -1422,6 +1423,7 @@ containing a value of this type.
         public static final int app_name=0x7f0a0026;
         public static final int button_contacts=0x7f0a002a;
         public static final int button_list_1=0x7f0a002e;
+        public static final int button_update=0x7f0a0031;
         public static final int com_facebook_choose_friends=0x7f0a001c;
         public static final int com_facebook_dialogloginactivity_ok_button=0x7f0a000d;
         public static final int com_facebook_internet_permission_error_message=0x7f0a0020;
