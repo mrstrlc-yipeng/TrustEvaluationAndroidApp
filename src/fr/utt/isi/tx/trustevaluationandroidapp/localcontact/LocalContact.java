@@ -1,5 +1,6 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.localcontact;
 
+import android.net.Uri;
 import android.widget.BaseAdapter;
 
 public class LocalContact {
@@ -9,15 +10,18 @@ public class LocalContact {
 
 	private String contactDetail;
 	
+	private Uri contactUri = null;
+	
 	private boolean isInsertedInDatabase;
 
 	private BaseAdapter adapter;
 
-	public LocalContact(String contactId, String displayName, String contactDetail) {
+	public LocalContact(String contactId, String displayName, String contactDetail, Uri contactUri) {
 		super();
 		this.contactId = contactId;
 		this.displayName = displayName;
 		this.contactDetail = contactDetail;
+		this.contactUri = contactUri;
 	}
 	
 	public String getContactId() {
@@ -48,6 +52,14 @@ public class LocalContact {
 		if (adapter != null) {
 			adapter.notifyDataSetChanged();
 		}
+	}
+	
+	public Uri getContactUri() {
+		return contactUri;
+	}
+
+	public void setContactUri(Uri contactUri) {
+		this.contactUri = contactUri;
 	}
 	
 	public boolean isInsertedInDatabase() {

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.QuickContactBadge;
 import android.widget.TextView;
 
 public class LocalContactArrayAdapter extends ArrayAdapter<LocalContact> {
@@ -42,11 +43,20 @@ public class LocalContactArrayAdapter extends ArrayAdapter<LocalContact> {
 		// get object
 		LocalContact contact = contacts.get(position);
 		if (contact != null) {
+			// quick contact badge possible to modify the contact
+			QuickContactBadge quickContactBadge = (QuickContactBadge) view
+					.findViewById(R.id.quick_contact_badge);
+
+			if (quickContactBadge != null && contact.getContactUri() != null) {
+				// assign the badge by local contact uri
+				quickContactBadge.assignContactUri(contact.getContactUri());
+			}
+
 			// text view to show display_name
 			TextView viewDisplayName = (TextView) view
 					.findViewById(R.id.contact_display_name);
 
-			if (viewDisplayName != null) {
+			if (viewDisplayName != null && contact.getDisplayName() != null) {
 				// show display_name
 				viewDisplayName.setText(cleanDisplayName(contact
 						.getDisplayName()));

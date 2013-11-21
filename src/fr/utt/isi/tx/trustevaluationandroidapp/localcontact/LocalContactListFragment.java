@@ -14,6 +14,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -143,11 +144,22 @@ public abstract class LocalContactListFragment extends Fragment implements
 					String contactId = cursor2
 							.getString(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+					
+					long contactLongId = cursor2
+							.getLong(cursor2
+									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
 
 					// get the contact names
 					String name = cursor2
 							.getString(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+					
+					String lookupKey = cursor2
+							.getString(cursor2
+									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY));
+					
+					Uri contactUri = Contacts.getLookupUri(contactLongId, lookupKey);
+					Log.v(TAG, "uri = " + contactUri);
 
 					// get the contact detail info (phone number or email
 					// address)
@@ -165,7 +177,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 					// set up contact list
 					if (contactDetail != null) {
 						LocalContact contact = new LocalContact(contactId,
-								name, contactDetail);
+								name, contactDetail, contactUri);
 
 						// check at here whether this contact has already been
 						// inserted into database
