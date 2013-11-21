@@ -19,6 +19,9 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -69,6 +72,8 @@ public class FacebookFriendListFragment extends Fragment implements
 		// create ui lifecycle helper instance
 		uiHelper = new UiLifecycleHelper(getActivity(), callback);
 		uiHelper.onCreate(savedInstanceState);
+		
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -97,6 +102,34 @@ public class FacebookFriendListFragment extends Fragment implements
 		proceedBySession(Session.getActiveSession(), false);
 
 		return view;
+	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+
+		Session session = Session.getActiveSession();
+		// only add the menu when the fragment is showing
+		if (this.isVisible() && session != null && session.isOpened()) {
+			if (menu.size() <= 1) {
+				menu.add(R.string.logout);
+			}
+		} else {
+			menu.clear();
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getTitle().equals(getResources().getString(R.string.logout))) {
+			// log out
+			Session.getActiveSession().closeAndClearTokenInformation();
+			
+			proceedBySession(Session.getActiveSession(), false);
+
+			return true;
+		}
+		return false;
 	}
 
 	private void onSessionStateChange(final Session session,
@@ -127,6 +160,7 @@ public class FacebookFriendListFragment extends Fragment implements
 							.setAdapter(new PseudoFacebookGraphUserListAdapter(
 									getActivity(),
 									R.layout.facebook_friend_list, contacts));
+					getActivity().supportInvalidateOptionsMenu();
 					return;
 				}
 			}
@@ -140,6 +174,8 @@ public class FacebookFriendListFragment extends Fragment implements
 			friendListView.setVisibility(View.INVISIBLE);
 			updateButtonView.setVisibility(View.INVISIBLE);
 		}
+		
+		getActivity().supportInvalidateOptionsMenu();
 	}
 
 	private void makeNewMyFriendRequest(final Session session) {

@@ -39,7 +39,7 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 	public static final int LINKEDIN = 4;
 
 	// contact type
-	public static int contactType;
+	public static int contactType = LOCAL_PHONE;
 
 	// fragment array index
 	private static final int LOCAL_PHONE_LIST_FRAGMENT = 0;
@@ -81,14 +81,6 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		Log.v(TAG, "activity state: onCreate");
 		super.onCreate(savedInstanceState);
-
-		// get intent extra
-		Intent intent = getIntent();
-		int intentExtra = intent.getIntExtra(MainActivity.EXTRA_CONTACT_TYPE,
-				LOCAL_PHONE);
-		contactType = intentExtra;
-		Log.v(TAG, "intent extra gotten: " + MainActivity.EXTRA_CONTACT_TYPE
-				+ "=" + intentExtra);
 
 		// create facebook ui lifecycle helper and pass the listener
 		uiHelper = new UiLifecycleHelper(this, callback);

@@ -1453,6 +1453,7 @@ containing a value of this type.
         public static final int development_env=0x7f0a0029;
         public static final int get_started=0x7f0a002c;
         public static final int linkedin_login_button_text=0x7f0a0030;
+        public static final int logout=0x7f0a0032;
         public static final int settings=0x7f0a002d;
         public static final int title_activity_list_contact_splitted=0x7f0a0028;
         public static final int twitter_login_button_text=0x7f0a002f;
