@@ -16,6 +16,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import android.net.Uri;
 import android.util.Log;
 
 public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
@@ -23,7 +24,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 20;
+	public static final int DATABASE_VERSION = 21;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
 	private SQLiteDatabase readable = null;
@@ -131,7 +132,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			return;
 		}
 
-		String query = "INSERT INTO " + tableName + " VALUES (?,?,?,?,?,?)";
+		String query = "INSERT INTO " + tableName + " VALUES (?,?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -143,8 +144,9 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				statement.bindString(2, contact.getContactId());
 				statement.bindString(3, contact.getDisplayName());
 				statement.bindString(4, contact.getContactDetail());
-				statement.bindNull(5);
-				statement.bindLong(6, 0);
+				statement.bindString(5, contact.getContactUri().toString());
+				statement.bindNull(6);
+				statement.bindLong(7, 0);
 				statement.execute();
 			}
 		}
@@ -158,17 +160,19 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 
 		String tableName;
-		String[] columnNames = new String[3];
+		String[] columnNames = new String[4];
 		if (contactType == ListContactSplittedActivity.LOCAL_PHONE) {
 			tableName = TrustEvaluationDataContract.LocalPhoneContact.TABLE_NAME;
 			columnNames[0] = TrustEvaluationDataContract.LocalPhoneContact.COLUMN_NAME_LOCAL_ID;
 			columnNames[1] = TrustEvaluationDataContract.LocalPhoneContact.COLUMN_NAME_LOCAL_NAME;
 			columnNames[2] = TrustEvaluationDataContract.LocalPhoneContact.COLUMN_NAME_LOCAL_NUMBER;
+			columnNames[3] = TrustEvaluationDataContract.LocalPhoneContact.COLUMN_NAME_LOCAL_URI;
 		} else if (contactType == ListContactSplittedActivity.LOCAL_EMAIL) {
 			tableName = TrustEvaluationDataContract.LocalEmailContact.TABLE_NAME;
 			columnNames[0] = TrustEvaluationDataContract.LocalEmailContact.COLUMN_NAME_LOCAL_ID;
 			columnNames[1] = TrustEvaluationDataContract.LocalEmailContact.COLUMN_NAME_LOCAL_NAME;
 			columnNames[2] = TrustEvaluationDataContract.LocalEmailContact.COLUMN_NAME_LOCAL_EMAIL;
+			columnNames[3] = TrustEvaluationDataContract.LocalEmailContact.COLUMN_NAME_LOCAL_URI;
 		} else {
 			return null;
 		}
@@ -183,7 +187,8 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				contacts.add(new LocalContact(c.getString(c
 						.getColumnIndex(columnNames[0])), c.getString(c
 						.getColumnIndex(columnNames[1])), c.getString(c
-						.getColumnIndex(columnNames[2]))));
+						.getColumnIndex(columnNames[2])), Uri.parse(c
+						.getString(c.getColumnIndex(columnNames[3])))));
 			}
 		}
 		c.close();

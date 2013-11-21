@@ -1161,7 +1161,7 @@ containing a value of this type.
         public static final int com_facebook_list_section_header_background=0x7f020069;
         public static final int com_facebook_loginbutton_silver=0x7f02006a;
         public static final int com_facebook_logo=0x7f02006b;
-        public static final int com_facebook_picker_default_separator_color=0x7f02008d;
+        public static final int com_facebook_picker_default_separator_color=0x7f02008e;
         public static final int com_facebook_picker_item_background=0x7f02006c;
         public static final int com_facebook_picker_list_focused=0x7f02006d;
         public static final int com_facebook_picker_list_longpressed=0x7f02006e;
@@ -1184,17 +1184,18 @@ containing a value of this type.
         public static final int foursquare=0x7f02007f;
         public static final int google=0x7f020080;
         public static final int googleplus=0x7f020081;
-        public static final int ic_launcher=0x7f020082;
-        public static final int icon=0x7f020083;
-        public static final int instagram=0x7f020084;
-        public static final int linkedin=0x7f020085;
-        public static final int mms=0x7f020086;
-        public static final int myspace=0x7f020087;
-        public static final int runkeeper=0x7f020088;
-        public static final int salesforce=0x7f020089;
-        public static final int twitter=0x7f02008a;
-        public static final int yahoo=0x7f02008b;
-        public static final int yammer=0x7f02008c;
+        public static final int ic_contact_picture_holo_light=0x7f020082;
+        public static final int ic_launcher=0x7f020083;
+        public static final int icon=0x7f020084;
+        public static final int instagram=0x7f020085;
+        public static final int linkedin=0x7f020086;
+        public static final int mms=0x7f020087;
+        public static final int myspace=0x7f020088;
+        public static final int runkeeper=0x7f020089;
+        public static final int salesforce=0x7f02008a;
+        public static final int twitter=0x7f02008b;
+        public static final int yahoo=0x7f02008c;
+        public static final int yammer=0x7f02008d;
     }
     public static final class id {
         public static final int action_bar=0x7f05001e;
@@ -1236,8 +1237,7 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_logo_image=0x7f050052;
         public static final int com_facebook_usersettingsfragment_profile_name=0x7f050053;
         public static final int contactEntryText=0x7f050055;
-        public static final int contact_detail=0x7f050061;
-        public static final int contact_display_name=0x7f050060;
+        public static final int contact_display_name=0x7f050061;
         public static final int contact_image=0x7f05005e;
         public static final int contact_name=0x7f05005f;
         public static final int default_activity_button=0x7f05002a;
@@ -1270,6 +1270,7 @@ containing a value of this type.
         public static final int picker_subtitle=0x7f05004f;
         public static final int progress_circular=0x7f050018;
         public static final int progress_horizontal=0x7f050019;
+        public static final int quick_contact_badge=0x7f050060;
         public static final int radio=0x7f050031;
         public static final int search_badge=0x7f050034;
         public static final int search_bar=0x7f050033;

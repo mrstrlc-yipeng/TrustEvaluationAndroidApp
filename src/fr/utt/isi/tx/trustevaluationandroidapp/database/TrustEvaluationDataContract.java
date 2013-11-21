@@ -57,6 +57,7 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_LOCAL_ID = "local_id";
 		public static final String COLUMN_NAME_LOCAL_NAME = "local_name";
 		public static final String COLUMN_NAME_LOCAL_NUMBER = "local_number";
+		public static final String COLUMN_NAME_LOCAL_URI = "local_uri";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
 
@@ -75,6 +76,9 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_LOCAL_NUMBER
 				+ " TEXT"
 				+ COMMA_SEP
+				+ COLUMN_NAME_LOCAL_URI
+				+ " TEXT"
+				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID
 				+ " INTEGER"
 				+ COMMA_SEP
@@ -89,6 +93,7 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_LOCAL_ID = "local_id";
 		public static final String COLUMN_NAME_LOCAL_NAME = "local_name";
 		public static final String COLUMN_NAME_LOCAL_EMAIL = "local_email";
+		public static final String COLUMN_NAME_LOCAL_URI = "local_uri";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
 		
@@ -105,6 +110,9 @@ public final class TrustEvaluationDataContract {
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_LOCAL_EMAIL
+				+ " TEXT"
+				+ COMMA_SEP
+				+ COLUMN_NAME_LOCAL_URI
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID
