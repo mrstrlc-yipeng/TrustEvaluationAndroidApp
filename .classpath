@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="libs/android-support-v7-gridlayout.jar"/>
 	<classpathentry kind="lib" path="libs/twitter4j-core-3.0.5.jar"/>
 	<classpathentry kind="lib" path="libs/android-support-v4.jar"/>
+	<classpathentry kind="lib" path="libs/orgbrickredcustomadapter.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

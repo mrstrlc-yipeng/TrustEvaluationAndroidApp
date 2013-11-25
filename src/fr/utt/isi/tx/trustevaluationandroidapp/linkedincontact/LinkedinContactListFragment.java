@@ -304,6 +304,7 @@ public class LinkedinContactListFragment extends Fragment implements
 			if (listElement != null) {
 				// profile image
 				ImageView i = (ImageView) view.findViewById(R.id.contact_image);
+				//imageLoader.DisplayImage("http://graph.facebook.com/100000524380683/picture", i);
 				imageLoader.DisplayImage(listElement.getProfileImageURL(), i);
 
 				// profile full name
