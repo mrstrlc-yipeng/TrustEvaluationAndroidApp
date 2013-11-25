@@ -24,7 +24,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 21;
+	public static final int DATABASE_VERSION = 22;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
 	private SQLiteDatabase readable = null;
@@ -334,7 +334,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
-				+ " VALUES (?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -343,11 +343,20 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			GraphUser contact = i.next();
 			if (!isContactInserted(ListContactSplittedActivity.FACEBOOK,
 					contact.getId())) {
+				// get facebook id
+				String facebookId = contact.getId();
+
+				// form facebook profile picture url by facebook id
+				String facebookProfilePictureUrl = "http://graph.facebook.com/"
+						+ facebookId + "/picture";
+				
+				// do statement
 				statement.clearBindings();
-				statement.bindString(2, contact.getId());
+				statement.bindString(2, facebookId);
 				statement.bindString(3, contact.getName());
-				statement.bindNull(4);
-				statement.bindLong(5, 0);
+				statement.bindString(4, facebookProfilePictureUrl);
+				statement.bindNull(5);
+				statement.bindLong(6, 0);
 				statement.execute();
 			}
 		}
@@ -369,11 +378,22 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			contacts = null;
 		} else {
 			while (c.moveToNext()) {
+				// get facebook id from cursor
+				String facebookId = c
+						.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID));
+
+				// get facebook name from cursor
+				String facebookName = c
+						.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_NAME));
+
+				// form the profile image url by facebook id
+				String facebookProfileImageUrl = "http://graph.facebook.com/"
+						+ facebookId + "/picture";
+
 				PseudoFacebookGraphUser contact = new PseudoFacebookGraphUser(
-						c.getString(c
-								.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID)),
-						c.getString(c
-								.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_NAME)));
+						facebookId, facebookName, facebookProfileImageUrl);
 				contacts.add(contact);
 			}
 		}
@@ -381,5 +401,4 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		return contacts;
 	}
-
 }

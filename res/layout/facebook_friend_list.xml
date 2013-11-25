@@ -5,14 +5,14 @@
     android:layout_height="wrap_content"
     android:layout_gravity="center_horizontal"
     android:orientation="horizontal" >
-
-    <com.facebook.widget.ProfilePictureView
-        android:id="@+id/friend_list_profile_pic"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    
+    <ImageView
+        android:id="@+id/profile_picture"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:padding="5dp"
         android:layout_gravity="center"
-        android:gravity="center_horizontal"
-        facebook:preset_size="small" />
+        android:gravity="center_horizontal" />
 
     <TextView
         android:id="@+id/friend_list_user_name"

@@ -128,6 +128,7 @@ public final class TrustEvaluationDataContract {
 		public static final String TABLE_NAME = "facebook_contact";
 		public static final String COLUMN_NAME_FACEBOOK_ID = "facebook_id";
 		public static final String COLUMN_NAME_FACEBOOK_NAME = "facebook_name";
+		public static final String COLUMN_NAME_FACEBOOK_PROFILE_IMAGE_URL = "facebook_profile_image_url";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
 		
@@ -141,6 +142,9 @@ public final class TrustEvaluationDataContract {
 				+ " INTERGER"
 				+ COMMA_SEP
 				+ COLUMN_NAME_FACEBOOK_NAME
+				+ " TEXT"
+				+ COMMA_SEP
+				+ COLUMN_NAME_FACEBOOK_PROFILE_IMAGE_URL
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID

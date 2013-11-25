@@ -5,11 +5,14 @@ public class PseudoFacebookGraphUser {
 	private String id;
 
 	private String name;
+	
+	private String profileImageUrl;
 
-	public PseudoFacebookGraphUser(String id, String name) {
+	public PseudoFacebookGraphUser(String id, String name, String profileImageUrl) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	public String getId() {
@@ -26,6 +29,14 @@ public class PseudoFacebookGraphUser {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
 	}
 
 }

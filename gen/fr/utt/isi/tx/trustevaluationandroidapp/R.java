@@ -1249,7 +1249,6 @@ containing a value of this type.
         public static final int expand_activities_button=0x7f050028;
         public static final int expanded_menu=0x7f05002e;
         public static final int facebook_friend_list=0x7f050059;
-        public static final int friend_list_profile_pic=0x7f050056;
         public static final int friend_list_user_name=0x7f050057;
         public static final int home=0x7f050014;
         public static final int homeAsUp=0x7f050005;
@@ -1268,6 +1267,7 @@ containing a value of this type.
         public static final int normal=0x7f050000;
         public static final int pager=0x7f05003e;
         public static final int picker_subtitle=0x7f05004f;
+        public static final int profile_picture=0x7f050056;
         public static final int progress_circular=0x7f050018;
         public static final int progress_horizontal=0x7f050019;
         public static final int quick_contact_badge=0x7f050060;
@@ -1453,6 +1453,7 @@ containing a value of this type.
         public static final int development_env=0x7f0a0029;
         public static final int get_started=0x7f0a002c;
         public static final int linkedin_login_button_text=0x7f0a0030;
+        public static final int logout=0x7f0a0032;
         public static final int settings=0x7f0a002d;
         public static final int title_activity_list_contact_splitted=0x7f0a0028;
         public static final int twitter_login_button_text=0x7f0a002f;

@@ -13,5 +13,6 @@
     <string name="twitter_login_button_text">Log in with Twitter</string>
     <string name="linkedin_login_button_text">Log in with LinkedIn</string>
     <string name="button_update">Update</string>
+    <string name="logout">Log out</string>
 
 </resources>
