@@ -70,18 +70,12 @@ public class LocalContactArrayAdapter extends ArrayAdapter<LocalContact> {
 	private String cleanDisplayName(String displayName) {
 		// clean display_name if its format is email
 		if (displayName.contains("@")) {
-			String[] split1 = displayName.split("@");
-
-			// reform to "firstname lastname" format if it contains a "."
-			if (split1[0].contains(".")) {
-				String[] split2 = split1[0].split("\\.");
-				return split2[0] + " " + split2[1];
-			} else {
-				return split1[0];
-			}
-
-		} else {
-			return displayName;
-		}
+			String[] split = displayName.split("@");			
+			displayName = split[0];
+		} 
+		// clean all the characters other than letters
+		String newDisplayName = displayName.replaceAll("[^a-zA-Z ]", "");
+		
+		return newDisplayName;
 	}
 }
