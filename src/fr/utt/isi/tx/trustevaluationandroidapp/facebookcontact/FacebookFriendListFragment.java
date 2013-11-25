@@ -13,6 +13,7 @@ import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
@@ -157,6 +158,9 @@ public class FacebookFriendListFragment extends Fragment implements
 			friendListView.setVisibility(View.VISIBLE);
 			updateButtonView.setVisibility(View.VISIBLE);
 
+			// show the progress dialog
+			ListContactSplittedActivity.mProgressDialog.show();
+
 			if (mDbHelper == null) {
 				mDbHelper = new TrustEvaluationDbHelper(getActivity());
 			}
@@ -172,6 +176,10 @@ public class FacebookFriendListFragment extends Fragment implements
 					friendListView
 							.setAdapter(mPseudoFacebookGraphUserListAdapter);
 					getActivity().supportInvalidateOptionsMenu();
+					
+					// dismiss the progress dialog
+					ListContactSplittedActivity.mProgressDialog.dismiss();
+					
 					return;
 				}
 			}
@@ -213,6 +221,9 @@ public class FacebookFriendListFragment extends Fragment implements
 								friendListView
 										.setAdapter(mGraphUserListAdapter);
 							}
+							
+							// dismiss the progress dialog
+							ListContactSplittedActivity.mProgressDialog.dismiss();
 						}
 						if (response.getError() != null) {
 							// TODO: handle error

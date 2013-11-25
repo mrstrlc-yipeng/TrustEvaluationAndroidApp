@@ -12,6 +12,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
@@ -59,11 +60,6 @@ public abstract class LocalContactListFragment extends Fragment implements
 		// get contact list view object
 		contactListView = (ListView) view.findViewById(R.id.local_contact_list);
 
-		// set adapter
-		contactListView.setAdapter(new LocalContactArrayAdapter(context,
-				R.layout.local_contact_list, getLocalContacts(getContactType(),
-						false)));
-
 		// get update button view object
 		updateButtonView = (Button) view.findViewById(R.id.update_button);
 		updateButtonView.setOnClickListener(this);
@@ -72,13 +68,30 @@ public abstract class LocalContactListFragment extends Fragment implements
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+
+		// show the progress dialog
+		ListContactSplittedActivity.mProgressDialog.show();
+
+		// execute the long running data retrieve task
+		new LongRunningDataRetrieve().execute(false);
+	}
+
+	@Override
 	public void onClick(View view) {
-		
+
 		switch (view.getId()) {
 		case R.id.update_button:
-			contactListView.setAdapter(new LocalContactArrayAdapter(context,
-					R.layout.local_contact_list, getLocalContacts(
-							getContactType(), true)));
+			// show the progress dialog
+			ListContactSplittedActivity.mProgressDialog.show();
+
+			// execute the long running data retrieve task
+			new LongRunningDataRetrieve().execute(true);
+
+			// contactListView.setAdapter(new LocalContactArrayAdapter(context,
+			// R.layout.local_contact_list, getLocalContacts(
+			// getContactType(), true)));
 			break;
 		default:
 			break;
@@ -87,6 +100,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 
 	protected List<LocalContact> getLocalContacts(int contactType,
 			boolean isForUpdate) {
+
 		if (mDbHelper == null) {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
@@ -107,7 +121,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 		// update database
 		Log.v(TAG, "updating database...");
 		updateDatabase(contactType, contacts);
-		
+
 		return contacts;
 	}
 
@@ -144,7 +158,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 					String contactId = cursor2
 							.getString(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
-					
+
 					long contactLongId = cursor2
 							.getLong(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
@@ -153,13 +167,13 @@ public abstract class LocalContactListFragment extends Fragment implements
 					String name = cursor2
 							.getString(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
-					
+
 					String lookupKey = cursor2
 							.getString(cursor2
 									.getColumnIndex(ContactsContract.CommonDataKinds.Phone.LOOKUP_KEY));
-					
-					Uri contactUri = Contacts.getLookupUri(contactLongId, lookupKey);
-					Log.v(TAG, "uri = " + contactUri);
+
+					Uri contactUri = Contacts.getLookupUri(contactLongId,
+							lookupKey);
 
 					// get the contact detail info (phone number or email
 					// address)
@@ -220,6 +234,27 @@ public abstract class LocalContactListFragment extends Fragment implements
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 		mDbHelper.insertLocalContact(contactType, contacts);
+	}
+
+	private class LongRunningDataRetrieve extends
+			AsyncTask<Boolean, Void, List<LocalContact>> {
+
+		@Override
+		protected List<LocalContact> doInBackground(Boolean... args) {
+			boolean isForUpdate = args[0];
+
+			return getLocalContacts(getContactType(), isForUpdate);
+		}
+
+		@Override
+		protected void onPostExecute(List<LocalContact> contactList) {
+			// set the list view
+			contactListView.setAdapter(new LocalContactArrayAdapter(context,
+					R.layout.local_contact_list, contactList));
+
+			// dismiss the progress dialog
+			ListContactSplittedActivity.mProgressDialog.dismiss();
+		}
 	}
 
 	public Context getContext() {
