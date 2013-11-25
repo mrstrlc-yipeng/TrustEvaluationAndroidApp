@@ -10,6 +10,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalEmailListFragme
 import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalPhoneListFragment;
 import fr.utt.isi.tx.trustevaluationandroidapp.twittercontact.TwitterFriendListFragment2;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBar.Tab;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Window;
 
 public class ListContactSplittedActivity extends ActionBarActivity implements
 		ActionBar.TabListener {
@@ -53,13 +55,16 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 	private static final int FRAGMENT_COUNT = FACEBOOK_USER_SETTINGS_FRAGMENT + 1;
 
 	// fragment array
-	//private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
+	// private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
 
 	// pager adapter
 	private ContactFragmentPagerAdapter mPagerAdapter;
 
 	// view pager
 	private ViewPager mViewPager;
+	
+	// progress dialog for all fragments
+	public static ProgressDialog mProgressDialog;
 
 	/**
 	 * Facebook UiLifecycleHelper
@@ -87,6 +92,11 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 		uiHelper.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_list_contact_splitted);
+		
+		// setup the progress dialog
+		mProgressDialog = new ProgressDialog(this);
+		mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		mProgressDialog.setMessage("Loading...");
 
 		// create pager adapter
 		mPagerAdapter = new ContactFragmentPagerAdapter(
@@ -116,16 +126,18 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 				});
 
 		// add tabs to action bar
-		actionBar.addTab(actionBar.newTab().setText("PhoneBook").setTag(LOCAL_PHONE)
-				.setTabListener(this));
-		actionBar.addTab(actionBar.newTab().setText("EmailBook").setTag(LOCAL_EMAIL)
-				.setTabListener(this));
-		actionBar.addTab(actionBar.newTab().setText("Facebook").setTag(FACEBOOK)
-				.setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("PhoneBook")
+				.setTag(LOCAL_PHONE).setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("EmailBook")
+				.setTag(LOCAL_EMAIL).setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("Facebook")
+				.setTag(FACEBOOK).setTabListener(this));
 		actionBar.addTab(actionBar.newTab().setText("Twitter").setTag(TWITTER)
 				.setTabListener(this));
-		actionBar.addTab(actionBar.newTab().setText("LinkedIn").setTag(LINKEDIN)
-				.setTabListener(this));
+		actionBar.addTab(actionBar.newTab().setText("LinkedIn")
+				.setTag(LINKEDIN).setTabListener(this));
+		
+		MainActivity.mProgressDialog.dismiss();
 	}
 
 	@Override

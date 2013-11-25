@@ -10,6 +10,7 @@ import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
@@ -60,7 +61,7 @@ public class LinkedinContactListFragment extends Fragment implements
 
 	// update button view
 	private Button updateButton;
-
+	
 	// whether the authorization (adapter.authorize(...)) is for retrieving
 	// contacts or just for the assignment of adapter (used in logout flow)
 	private boolean isAuthorizationForContacts = true;
@@ -197,6 +198,8 @@ public class LinkedinContactListFragment extends Fragment implements
 		// retrieving contacts
 		isAuthorizationForContacts = false;
 		proceed();
+		
+		ListContactSplittedActivity.mProgressDialog.dismiss();
 
 		// sign out via adapter
 		adapter.signOut(getActivity(), Provider.LINKEDIN.toString());
@@ -214,6 +217,7 @@ public class LinkedinContactListFragment extends Fragment implements
 
 		@Override
 		public void onComplete(Bundle values) {
+			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
 				// set "is_first_visit" to false
 				isFirstVisit = false;
@@ -265,6 +269,8 @@ public class LinkedinContactListFragment extends Fragment implements
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
+			
+			ListContactSplittedActivity.mProgressDialog.dismiss();
 		}
 
 		@Override

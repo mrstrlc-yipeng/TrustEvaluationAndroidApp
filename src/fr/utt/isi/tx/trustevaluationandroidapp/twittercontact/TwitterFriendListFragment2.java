@@ -10,6 +10,7 @@ import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
@@ -200,6 +201,8 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		// retrieving contacts
 		isAuthorizationForContacts = false;
 		proceed();
+		
+		ListContactSplittedActivity.mProgressDialog.dismiss();
 
 		// sign out via adapter
 		adapter.signOut(getActivity(), Provider.TWITTER.toString());
@@ -217,6 +220,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		@Override
 		public void onComplete(Bundle values) {
+			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
 				// set "is_first_visit" to false
 				isFirstVisit = false;
@@ -267,6 +271,8 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
+			
+			ListContactSplittedActivity.mProgressDialog.dismiss();
 		}
 
 		@Override
