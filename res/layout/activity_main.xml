@@ -26,6 +26,12 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/button_list_1" />
+        
+        <Button
+            android:id="@+id/button_list_2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_list_2" />
 
     </LinearLayout>
 

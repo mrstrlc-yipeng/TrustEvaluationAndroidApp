@@ -31,6 +31,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		
 		Button button_list_1 = (Button) findViewById(R.id.button_list_1);
 		button_list_1.setOnClickListener(this);
+		
+		Button button_list_2 = (Button) findViewById(R.id.button_list_2);
+		button_list_2.setOnClickListener(this);
 	}
 
 	@Override
@@ -46,6 +49,9 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (view.getId()) {
 		case R.id.button_list_1:
 			startActivity(new Intent(this, ListContactSplittedActivity.class));
+			break;
+		case R.id.button_list_2:
+			startActivity(new Intent(this, ListContactMergedActivity.class));
 			break;
 		default:
 			break;
