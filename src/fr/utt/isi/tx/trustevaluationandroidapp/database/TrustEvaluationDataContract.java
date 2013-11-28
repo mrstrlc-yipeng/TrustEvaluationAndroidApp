@@ -18,6 +18,10 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_IS_FACEBOOK = "is_facebook";
 		public static final String COLUMN_NAME_IS_TWITTER = "is_twitter";
 		public static final String COLUMN_NAME_IS_LINKEDIN = "is_linkedin";
+		public static final String COLUMN_NAME_LOCAL_ID = "local_id";
+		public static final String COLUMN_NAME_FACEBOOK_ID = "facebook_id";
+		public static final String COLUMN_NAME_TWITTER_ID = "twitter_id";
+		public static final String COLUMN_NAME_LINKEDIN_ID = "linkedin_id";
 
 		public static final String SQL_CREATE_ENTRIES = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
@@ -32,7 +36,7 @@ public final class TrustEvaluationDataContract {
 				+ " INTEGER"
 				+ COMMA_SEP
 				+ COLUMN_NAME_TRUST_SCORE
-				+ " INTEGER"
+				+ " INTEGER DEFAULT 0"
 				+ COMMA_SEP
 				+ COLUMN_NAME_IS_LOCAL_PHONE
 				+ " TINYINT"
@@ -46,7 +50,19 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_IS_TWITTER
 				+ " TINYINT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_IS_LINKEDIN + " TINYINT" + ")";
+				+ COLUMN_NAME_IS_LINKEDIN
+				+ " TINYINT"
+				+ COMMA_SEP
+				+ COLUMN_NAME_LOCAL_ID
+				+ " INTEGER DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_FACEBOOK_ID
+				+ " TEXT DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_TWITTER_ID
+				+ " TEXT DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_LINKEDIN_ID + " TEXT DEFAULT NULL" + ")";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;
@@ -80,9 +96,11 @@ public final class TrustEvaluationDataContract {
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID
-				+ " INTEGER"
+				+ " INTEGER DEFAULT NULL"
 				+ COMMA_SEP
-				+ COLUMN_NAME_IS_MERGED + " TINYINT" + " )";
+				+ COLUMN_NAME_IS_MERGED
+				+ " TINYINT DEFAULT 0"
+				+ " )";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;
@@ -96,7 +114,7 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_LOCAL_URI = "local_uri";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
-		
+
 		public static final String SQL_CREATE_ENTRIES = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
 				+ " ("
@@ -116,9 +134,11 @@ public final class TrustEvaluationDataContract {
 				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_CONTACT_NODE_ID
-				+ " INTEGER"
+				+ " INTEGER DEFAULT NULL"
 				+ COMMA_SEP
-				+ COLUMN_NAME_IS_MERGED + " TINYINT" + " )";
+				+ COLUMN_NAME_IS_MERGED
+				+ " TINYINT DEFAULT 0"
+				+ " )";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;
@@ -129,9 +149,10 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_FACEBOOK_ID = "facebook_id";
 		public static final String COLUMN_NAME_FACEBOOK_NAME = "facebook_name";
 		public static final String COLUMN_NAME_FACEBOOK_PROFILE_IMAGE_URL = "facebook_profile_image_url";
+		public static final String COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST = "facebook_common_friend_list";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
-		
+
 		public static final String SQL_CREATE_ENTRIES = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
 				+ " ("
@@ -147,10 +168,15 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_FACEBOOK_PROFILE_IMAGE_URL
 				+ " TEXT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_CONTACT_NODE_ID
-				+ " INTEGER"
+				+ COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST
+				+ " TEXT DEFAULT NULL"
 				+ COMMA_SEP
-				+ COLUMN_NAME_IS_MERGED + " TINYINT" + " )";
+				+ COLUMN_NAME_CONTACT_NODE_ID
+				+ " INTEGER DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_MERGED
+				+ " TINYINT DEFAULT 0"
+				+ " )";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;
@@ -162,9 +188,10 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_TWITTER_NAME = "twitter_name";
 		public static final String COLUMN_NAME_TWITTER_USERNAME = "twitter_username";
 		public static final String COLUMN_NAME_TWITTER_PROFILE_IMAGE_URL = "twitter_profile_image_url";
+		public static final String COLUMN_NAME_TWITTER_COMMON_FRIEND_LIST = "twitter_common_friend_list";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
-		
+
 		public static final String SQL_CREATE_ENTRIES = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
 				+ " ("
@@ -172,7 +199,7 @@ public final class TrustEvaluationDataContract {
 				+ " INTEGER PRIMARY KEY"
 				+ COMMA_SEP
 				+ COLUMN_NAME_TWITTER_ID
-				+ " INTEGER"
+				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_TWITTER_NAME
 				+ " TEXT"
@@ -183,10 +210,15 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_TWITTER_PROFILE_IMAGE_URL
 				+ " TEXT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_CONTACT_NODE_ID
-				+ " INTEGER"
+				+ COLUMN_NAME_TWITTER_COMMON_FRIEND_LIST
+				+ " TEXT DEFAULT NULL"
 				+ COMMA_SEP
-				+ COLUMN_NAME_IS_MERGED + " TINYINT" + " )";
+				+ COLUMN_NAME_CONTACT_NODE_ID
+				+ " INTEGER DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_MERGED
+				+ " TINYINT DEFAULT 0"
+				+ " )";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;
@@ -198,9 +230,10 @@ public final class TrustEvaluationDataContract {
 		public static final String COLUMN_NAME_LINKEDIN_FIRST_NAME = "linkedin_first_name";
 		public static final String COLUMN_NAME_LINKEDIN_LAST_NAME = "linkedin_last_name";
 		public static final String COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL = "linkedin_profile_image_url";
+		public static final String COLUMN_NAME_LINKEDIN_COMMON_FRIEND_LIST= "linkedin_common_friend_list";
 		public static final String COLUMN_NAME_CONTACT_NODE_ID = "contact_node_id";
 		public static final String COLUMN_NAME_IS_MERGED = "is_merged";
-		
+
 		public static final String SQL_CREATE_ENTRIES = "CREATE TABLE IF NOT EXISTS "
 				+ TABLE_NAME
 				+ " ("
@@ -208,7 +241,7 @@ public final class TrustEvaluationDataContract {
 				+ " INTEGER PRIMARY KEY"
 				+ COMMA_SEP
 				+ COLUMN_NAME_LINKEDIN_ID
-				+ " INTERGER"
+				+ " TEXT"
 				+ COMMA_SEP
 				+ COLUMN_NAME_LINKEDIN_FIRST_NAME
 				+ " TEXT"
@@ -219,10 +252,15 @@ public final class TrustEvaluationDataContract {
 				+ COLUMN_NAME_LINKEDIN_PROFILE_IMAGE_URL
 				+ " TEXT"
 				+ COMMA_SEP
-				+ COLUMN_NAME_CONTACT_NODE_ID
-				+ " INTEGER"
+				+ COLUMN_NAME_LINKEDIN_COMMON_FRIEND_LIST
+				+ " TEXT DEFAULT NULL"
 				+ COMMA_SEP
-				+ COLUMN_NAME_IS_MERGED + " TINYINT" + " )";
+				+ COLUMN_NAME_CONTACT_NODE_ID
+				+ " INTEGER DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_MERGED
+				+ " TINYINT DEFAULT 0"
+				+ " )";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;

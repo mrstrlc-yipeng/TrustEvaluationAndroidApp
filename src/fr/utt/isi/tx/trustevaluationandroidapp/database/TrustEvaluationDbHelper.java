@@ -3,6 +3,8 @@ package fr.utt.isi.tx.trustevaluationandroidapp.database;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.brickred.socialauth.Contact;
 
@@ -24,8 +26,16 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 22;
+	public static final int DATABASE_VERSION = 28;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
+
+	public static final String[] TABLE_NAMES = {
+			TrustEvaluationDataContract.ContactNode.TABLE_NAME,
+			TrustEvaluationDataContract.LocalPhoneContact.TABLE_NAME,
+			TrustEvaluationDataContract.LocalEmailContact.TABLE_NAME,
+			TrustEvaluationDataContract.FacebookContact.TABLE_NAME,
+			TrustEvaluationDataContract.TwitterContact.TABLE_NAME,
+			TrustEvaluationDataContract.LinkedinContact.TABLE_NAME };
 
 	private SQLiteDatabase readable = null;
 	private SQLiteDatabase writable = null;
@@ -56,6 +66,26 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		db.execSQL(TrustEvaluationDataContract.FacebookContact.SQL_DELETE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.TwitterContact.SQL_DELETE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LinkedinContact.SQL_DELETE_ENTRIES);
+	}
+
+	public void clearTable(String tableName) {
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+
+		String query = "DELETE FROM " + tableName;
+		Log.v(TAG, "deleting table " + tableName);
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+		statement.execute();
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
+	}
+
+	public void clearDatabase() {
+		for (int i = 0; i < TABLE_NAMES.length; i++) {
+			clearTable(TABLE_NAMES[i]);
+		}
 	}
 
 	public boolean isContactInserted(int contactType, String contactId) {
@@ -145,8 +175,6 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				statement.bindString(3, contact.getDisplayName());
 				statement.bindString(4, contact.getContactDetail());
 				statement.bindString(5, contact.getContactUri().toString());
-				statement.bindNull(6);
-				statement.bindLong(7, 0);
 				statement.execute();
 			}
 		}
@@ -203,7 +231,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.TwitterContact.TABLE_NAME
-				+ " VALUES (?,?,?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -220,8 +248,6 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				statement.bindString(4, contact.getDisplayName());
 				// profile image url
 				statement.bindString(5, contact.getProfileImageURL());
-				statement.bindNull(6);
-				statement.bindLong(7, 0);
 				statement.execute();
 			}
 		}
@@ -267,7 +293,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.LinkedinContact.TABLE_NAME
-				+ " VALUES (?,?,?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -287,8 +313,6 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				} else {
 					statement.bindString(5, contact.getProfileImageURL());
 				}
-				statement.bindNull(6);
-				statement.bindLong(7, 0);
 				statement.execute();
 			}
 		}
@@ -334,7 +358,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
-				+ " VALUES (?,?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -349,18 +373,47 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 				// form facebook profile picture url by facebook id
 				String facebookProfilePictureUrl = "http://graph.facebook.com/"
 						+ facebookId + "/picture";
-				
+
 				// do statement
 				statement.clearBindings();
 				statement.bindString(2, facebookId);
 				statement.bindString(3, contact.getName());
 				statement.bindString(4, facebookProfilePictureUrl);
-				statement.bindNull(5);
-				statement.bindLong(6, 0);
 				statement.execute();
 			}
 		}
 
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
+	}
+
+	public void updateFacebookCommonFriendList(
+			Map<String, String> commonFriendMap) {
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+		
+		String query = "UPDATE "
+				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
+				+ " SET "
+				+ TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST
+				+ "=? WHERE "
+				+ TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID
+				+ "=?";
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+		
+		for (Entry<String, String> entry : commonFriendMap.entrySet()) {
+			Log.v(TAG, "updating facebook common friend list...");
+			String facebookId = entry.getKey();
+			String commonFriendList = entry.getValue();
+			
+			statement.clearBindings();
+			statement.bindString(1, facebookId);
+			statement.bindString(2, commonFriendList);
+			statement.execute();
+		}
+		
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
 	}

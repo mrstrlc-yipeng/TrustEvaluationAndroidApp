@@ -5,6 +5,7 @@ import java.util.List;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
 import android.app.Activity;
@@ -115,6 +116,18 @@ public abstract class LocalContactListFragment extends Fragment implements
 				return contacts;
 			}
 		}
+		
+		// update flow
+		// clear the table and re-insert all data
+		String tableName;
+		if (contactType == ListContactSplittedActivity.LOCAL_PHONE) {
+			tableName = TrustEvaluationDataContract.LocalPhoneContact.TABLE_NAME;
+		} else if (contactType == ListContactSplittedActivity.LOCAL_EMAIL) {
+			tableName = TrustEvaluationDataContract.LocalEmailContact.TABLE_NAME;
+		} else {
+			return null;
+		}
+		mDbHelper.clearTable(tableName);
 
 		// get contacts from device
 		contacts = (ArrayList<LocalContact>) getLocalContactsFromDevice(contactType);

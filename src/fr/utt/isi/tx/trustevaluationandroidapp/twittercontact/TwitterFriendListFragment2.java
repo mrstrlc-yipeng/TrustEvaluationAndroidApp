@@ -12,6 +12,7 @@ import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
 import android.content.Context;
@@ -130,7 +131,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		if (item.getTitle().equals(getResources().getString(R.string.logout))) {
 			// log out
 			proceedLogout();
-			
+
 			// re-create options menu
 			getActivity().supportInvalidateOptionsMenu();
 
@@ -168,6 +169,13 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			proceed();
 			break;
 		case R.id.update_button:
+			// update flow
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			// clear table and re-proceed the data retrieve and data insert
+			mDbHelper
+					.clearTable(TrustEvaluationDataContract.TwitterContact.TABLE_NAME);
 			proceed();
 			break;
 		default:
@@ -201,7 +209,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		// retrieving contacts
 		isAuthorizationForContacts = false;
 		proceed();
-		
+
 		ListContactSplittedActivity.mProgressDialog.dismiss();
 
 		// sign out via adapter
@@ -214,12 +222,20 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		e.commit();
 
 		toggleView();
+
+		// clear table
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		mDbHelper
+				.clearTable(TrustEvaluationDataContract.TwitterContact.TABLE_NAME);
 	}
 
 	private final class ResponseListener implements DialogListener {
 
 		@Override
 		public void onComplete(Bundle values) {
+			Log.v(TAG, "twitter fragment progress dialog shown");
 			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
 				// set "is_first_visit" to false
@@ -229,7 +245,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 				e.commit();
 
 				toggleView();
-				
+
 				getActivity().supportInvalidateOptionsMenu();
 
 				// contact list
@@ -271,7 +287,8 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
-			
+
+			Log.v(TAG, "twitter fragment progress dialog dismiss");
 			ListContactSplittedActivity.mProgressDialog.dismiss();
 		}
 
@@ -287,7 +304,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		public TwitterContactAdapter(Context context, int textViewResourceId,
 				List<Contact> contacts) {
-			super(context, textViewResourceId);
+			super(context, textViewResourceId, contacts);
 
 			this.contacts = contacts;
 			imageLoader = new ImageLoader(context);
