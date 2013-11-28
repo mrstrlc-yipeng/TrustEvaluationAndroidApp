@@ -46,6 +46,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
+		db.execSQL(TrustEvaluationDataContract.ContactNode.SQL_CREATE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalPhoneContact.SQL_CREATE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalEmailContact.SQL_CREATE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.FacebookContact.SQL_CREATE_ENTRIES);

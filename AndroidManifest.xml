@@ -57,6 +57,22 @@
                     android:scheme="x-trust-evaluation-android-app-oauth-twitter" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="fr.utt.isi.tx.trustevaluationandroidapp.ListContactMergedActivity"
+            android:label="@string/app_name"
+            android:parentActivityName="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" />
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
