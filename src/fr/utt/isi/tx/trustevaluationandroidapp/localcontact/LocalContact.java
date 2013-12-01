@@ -11,8 +11,6 @@ public class LocalContact {
 	private String contactDetail;
 	
 	private Uri contactUri = null;
-	
-	private boolean isInsertedInDatabase;
 
 	private BaseAdapter adapter;
 
@@ -60,14 +58,6 @@ public class LocalContact {
 
 	public void setContactUri(Uri contactUri) {
 		this.contactUri = contactUri;
-	}
-	
-	public boolean isInsertedInDatabase() {
-		return isInsertedInDatabase;
-	}
-
-	public void setInsertedInDatabase(boolean isInsertedInDatabase) {
-		this.isInsertedInDatabase = isInsertedInDatabase;
 	}
 
 	public void setAdapter(BaseAdapter adapter) {

@@ -24,7 +24,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 22;
+	public static final int DATABASE_VERSION = 23;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
 	private SQLiteDatabase readable = null;
@@ -140,7 +140,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<LocalContact> i = contacts.iterator();
 		while (i.hasNext()) {
 			LocalContact contact = i.next();
-			if (!contact.isInsertedInDatabase()) {
+			if (!isContactInserted(contactType, contact.getContactId())) {
 				statement.clearBindings();
 				statement.bindString(2, contact.getContactId());
 				statement.bindString(3, contact.getDisplayName());

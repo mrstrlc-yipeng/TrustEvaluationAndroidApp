@@ -193,10 +193,6 @@ public abstract class LocalContactListFragment extends Fragment implements
 						LocalContact contact = new LocalContact(contactId,
 								name, contactDetail, contactUri);
 
-						// check at here whether this contact has already been
-						// inserted into database
-						contact.setInsertedInDatabase(mDbHelper
-								.isContactInserted(contactType, contactId));
 						contacts.add(contact);
 					}
 

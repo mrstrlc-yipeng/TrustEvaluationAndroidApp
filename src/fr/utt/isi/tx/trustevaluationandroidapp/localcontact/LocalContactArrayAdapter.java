@@ -30,6 +30,11 @@ public class LocalContactArrayAdapter extends ArrayAdapter<LocalContact> {
 			contacts.get(i).setAdapter(this);
 		}
 	}
+	
+	@Override
+	public int getCount() {
+		return contacts.size();
+	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View view = convertView;
@@ -75,7 +80,7 @@ public class LocalContactArrayAdapter extends ArrayAdapter<LocalContact> {
 		} 
 		// clean all the characters other than letters
 		String newDisplayName1 = displayName.replaceAll("[1-9]", "");
-		String newDisplayName = newDisplayName1.replaceAll("[^a-zA-Z ]", " ");
+		String newDisplayName = newDisplayName1.replaceAll("[^a-zA-Z]", " ");
 		
 		return newDisplayName;
 	}

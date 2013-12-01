@@ -3,16 +3,52 @@ package fr.utt.isi.tx.trustevaluationandroidapp.matching;
 public class MatchingAlgo {
 	private static String compOne;
     private static String compTwo;
- 
     private static String theMatchA = "";
     private static String theMatchB = "";
     private static int mRange = -1;
     private static int minSize; 
     private static int sizeStrOne;
     private static int sizeStrTwo;
-
- 
-    public static double getSimilarity(String s1, String s2)
+    
+	public static boolean isOnePerson (String s1, String s2) {
+		boolean isOnePerson = false;	
+		int match = 0;
+		double score;
+		
+		String[] name1 = s1.split(" "); 
+		String[] name2 = s2.split(" "); 
+		
+		// Number of sub-strings
+		int strNb1 = name1.length;
+		int strNb2 = name2.length;
+		
+		int minNb = Math.min(strNb1, strNb2);
+						
+		for (int i = 0; i < strNb1; i++) {
+			int maxMatch = -1;
+			double maxScore = 0;
+			
+			for (int j = 0; j < strNb2; j++) {
+				score = getSimilarity (name1[i], name2[j]);
+				if ( score > maxScore) {
+					maxScore = score;
+					maxMatch = j;
+				}				
+			}
+			
+			if (maxScore >= 0.7) {
+				match++;
+				name2[maxMatch] = "";
+			}			
+		}
+		
+		if (match == minNb) isOnePerson = true;
+		
+		return isOnePerson;
+	}
+	
+	
+    public static double getSimilarity (String s1, String s2)
     {
         compOne = s1;
         compTwo = s2;
@@ -41,7 +77,7 @@ public class MatchingAlgo {
         
         dj = f * ((double)m/sizeStrOne+(double)m/sizeStrTwo+(double)mt);
         dw = dj + getCommonPrefix(compOne,compTwo) * (0.1*(1.0 - dj));
-             
+        
         return dw;
     }
  
@@ -65,9 +101,7 @@ public class MatchingAlgo {
                 {
                     matches++;
                     
-                    theMatchA = theMatchA + compOne.charAt(i);
-                    if (i < compTwo.length()) theMatchB = theMatchB + compTwo.charAt(i);
-                    else theMatchB = theMatchB + '0';
+                    theMatchA += compOne.charAt(i);
                     
                     strOne[i] = '0';
                     strTwo[i - counter] = '0';
@@ -84,9 +118,7 @@ public class MatchingAlgo {
                 {
                     matches++;
                     
-                    theMatchA = theMatchA + compOne.charAt(i);
-                    if (i < compTwo.length()) theMatchB = theMatchB + compTwo.charAt(i);
-                    else theMatchB = theMatchB + '0';
+                    theMatchA += compOne.charAt(i);
                     
                     strOne[i] = '0';
                     strTwo[i + counter] = '0';
@@ -97,6 +129,10 @@ public class MatchingAlgo {
             
         }
         
+        for (int j = 0; j < strTwo.length; j++) {
+        	if (strTwo[j] == '0') theMatchB += compTwo.charAt(j);
+        }
+
         return matches;
     }
  
@@ -110,18 +146,20 @@ public class MatchingAlgo {
         		transPositions++;
         	}       	
         }
-        
+          
         return transPositions;
     }
  
     private static int getCommonPrefix(String compOne, String compTwo)
     {
-        int cp = 0;        
+        int cp = 0;    
+        
         for (int i = 0; i < 4 && i < minSize; i++)
         {
             if (compOne.charAt(i) == compTwo.charAt(i)) cp++;
         }
+        
         return cp;
     }
-
+    
 }
