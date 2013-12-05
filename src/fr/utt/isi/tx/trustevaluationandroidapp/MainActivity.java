@@ -1,5 +1,7 @@
 package fr.utt.isi.tx.trustevaluationandroidapp;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactMergedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;

@@ -5,7 +5,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
 
-    <fragment android:name="fr.utt.isi.tx.trustevaluationandroidapp.matching.MatchingListFragment"
+    <fragment android:name="fr.utt.isi.tx.trustevaluationandroidapp.fragments.MatchingListFragment"
           android:id="@+id/fragment_matching_list"
           android:layout_width="match_parent"
           android:layout_height="match_parent" />

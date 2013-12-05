@@ -10,9 +10,9 @@ import org.brickred.socialauth.Contact;
 
 import com.facebook.model.GraphUser;
 
-import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact.PseudoFacebookGraphUser;
-import fr.utt.isi.tx.trustevaluationandroidapp.localcontact.LocalContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
