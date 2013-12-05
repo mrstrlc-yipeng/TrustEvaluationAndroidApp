@@ -300,7 +300,7 @@ public class LinkedinContactListFragment extends Fragment implements
 
 		public LinkedinContactAdapter(Context context, int textViewResourceId,
 				List<Contact> contacts) {
-			super(context, textViewResourceId);
+			super(context, textViewResourceId, contacts);
 
 			this.contacts = contacts;
 			imageLoader = new ImageLoader(context);

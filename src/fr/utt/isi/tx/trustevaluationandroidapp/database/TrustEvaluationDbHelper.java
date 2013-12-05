@@ -26,7 +26,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 28;
+	public static final int DATABASE_VERSION = 29;
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
 	public static final String[] TABLE_NAMES = {
@@ -170,7 +170,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<LocalContact> i = contacts.iterator();
 		while (i.hasNext()) {
 			LocalContact contact = i.next();
-			if (!contact.isInsertedInDatabase()) {
+			if (!isContactInserted(contactType, contact.getContactId())) {
 				statement.clearBindings();
 				statement.bindString(2, contact.getContactId());
 				statement.bindString(3, contact.getDisplayName());
@@ -388,37 +388,6 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		writable.endTransaction();
 	}
 
-	public void updateFacebookCommonFriendList(
-			Map<String, String> commonFriendMap) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
-		
-		String query = "UPDATE "
-				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
-				+ " SET "
-				+ TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST
-				+ "=? WHERE "
-				+ TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID
-				+ "=?";
-		SQLiteStatement statement = writable.compileStatement(query);
-		writable.beginTransaction();
-		
-		for (Entry<String, String> entry : commonFriendMap.entrySet()) {
-			Log.v(TAG, "updating facebook common friend list...");
-			String facebookId = entry.getKey();
-			String commonFriendList = entry.getValue();
-			
-			statement.clearBindings();
-			statement.bindString(1, facebookId);
-			statement.bindString(2, commonFriendList);
-			statement.execute();
-		}
-		
-		writable.setTransactionSuccessful();
-		writable.endTransaction();
-	}
-
 	public List<PseudoFacebookGraphUser> getFacebookContacts(String sortOrder) {
 		if (readable == null) {
 			readable = this.getReadableDatabase();
@@ -454,5 +423,63 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		c.close();
 
 		return contacts;
+	}
+
+	public void updateCommonFriendList(Map<String, String> commonFriendMap,
+			int contactType) {
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+
+		// set the parameters of sql query depending on SNS type
+		String tableName;
+		String commonFriendListColumnName;
+		String contactIdColumnName;
+		switch (contactType) {
+		case ListContactSplittedActivity.FACEBOOK:
+			tableName = TrustEvaluationDataContract.FacebookContact.TABLE_NAME;
+			commonFriendListColumnName = TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST;
+			contactIdColumnName = TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID;
+			break;
+		case ListContactSplittedActivity.TWITTER:
+			tableName = TrustEvaluationDataContract.TwitterContact.TABLE_NAME;
+			commonFriendListColumnName = TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_COMMON_FRIEND_LIST;
+			contactIdColumnName = TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_ID;
+			break;
+		case ListContactSplittedActivity.LINKEDIN:
+			tableName = TrustEvaluationDataContract.LinkedinContact.TABLE_NAME;
+			commonFriendListColumnName = TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_COMMON_FRIEND_LIST;
+			contactIdColumnName = TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_ID;
+			break;
+		default:
+			return;
+		}
+
+		// the query
+		String query = "UPDATE "
+				+ tableName
+				+ " SET "
+				+ commonFriendListColumnName
+				+ "=? WHERE "
+				+ contactIdColumnName
+				+ "=?";
+		
+		// do statement by transaction
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+
+		for (Entry<String, String> entry : commonFriendMap.entrySet()) {
+			String contactId = entry.getKey();
+			String commonFriendList = entry.getValue();
+			Log.v(TAG, "key: " + contactId + ", value: " + commonFriendList);
+
+			statement.clearBindings();
+			statement.bindString(1, contactId);
+			statement.bindString(2, commonFriendList);
+			statement.execute();
+		}
+
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
 	}
 }

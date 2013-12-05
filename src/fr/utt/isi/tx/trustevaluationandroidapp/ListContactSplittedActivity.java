@@ -187,7 +187,7 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 				resultCode, data);
 	}
 
-	public class ContactFragmentPagerAdapter extends FragmentStatePagerAdapter {
+	private class ContactFragmentPagerAdapter extends FragmentStatePagerAdapter {
 
 		public ContactFragmentPagerAdapter(FragmentManager fm) {
 			super(fm);

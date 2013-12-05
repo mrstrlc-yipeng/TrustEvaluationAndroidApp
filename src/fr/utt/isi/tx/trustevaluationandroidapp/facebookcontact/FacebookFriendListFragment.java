@@ -3,6 +3,8 @@ package fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -33,6 +35,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.content.Context;
 import android.content.Intent;
@@ -171,12 +174,13 @@ public class FacebookFriendListFragment extends Fragment implements
 			// log out flow
 			// destroy session
 			Session.getActiveSession().closeAndClearTokenInformation();
-			
+
 			// clear table
 			if (mDbHelper == null) {
 				mDbHelper = new TrustEvaluationDbHelper(getActivity());
 			}
-			mDbHelper.clearTable(TrustEvaluationDataContract.FacebookContact.TABLE_NAME);
+			mDbHelper
+					.clearTable(TrustEvaluationDataContract.FacebookContact.TABLE_NAME);
 
 			// toggle views
 			proceedBySession(Session.getActiveSession(), false);
@@ -490,7 +494,8 @@ public class FacebookFriendListFragment extends Fragment implements
 					HttpResponse response = httpClient.execute(httpGet,
 							localContext);
 					JSONObject mJSONObject = new JSONObject(
-							getASCIIContentFromEntity(response.getEntity()));
+							Utils.getASCIIContentFromEntity(response
+									.getEntity()));
 					JSONArray dataArray = mJSONObject.getJSONArray("data");
 
 					// parse json
@@ -522,31 +527,18 @@ public class FacebookFriendListFragment extends Fragment implements
 
 		@Override
 		protected void onPostExecute(Map<String, String> results) {
+			if (results == null || results.size() == 0) {
+				return;
+			}
+
 			// update database
 			if (mDbHelper == null) {
-				mDbHelper = new TrustEvaluationDbHelper(
-						getActivity());
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
 			}
-			mDbHelper.updateFacebookCommonFriendList(results);
+			mDbHelper.updateCommonFriendList(results,
+					ListContactSplittedActivity.FACEBOOK);
 		}
 
-		// parse the response entity to readable string
-		protected String getASCIIContentFromEntity(HttpEntity entity)
-				throws IllegalStateException, IOException {
-			InputStream in = entity.getContent();
-
-			StringBuffer out = new StringBuffer();
-			int n = 1;
-			while (n > 0) {
-				byte[] b = new byte[4096];
-				n = in.read(b);
-
-				if (n > 0)
-					out.append(new String(b, 0, n));
-			}
-
-			return out.toString();
-		}
 	}
 
 }

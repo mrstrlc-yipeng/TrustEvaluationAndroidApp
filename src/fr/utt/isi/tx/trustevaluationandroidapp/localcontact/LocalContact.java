@@ -5,25 +5,24 @@ import android.widget.BaseAdapter;
 
 public class LocalContact {
 	private String contactId;
-	
+
 	private String displayName;
 
 	private String contactDetail;
-	
+
 	private Uri contactUri = null;
-	
-	private boolean isInsertedInDatabase;
 
 	private BaseAdapter adapter;
 
-	public LocalContact(String contactId, String displayName, String contactDetail, Uri contactUri) {
+	public LocalContact(String contactId, String displayName,
+			String contactDetail, Uri contactUri) {
 		super();
 		this.contactId = contactId;
 		this.displayName = displayName;
 		this.contactDetail = contactDetail;
 		this.contactUri = contactUri;
 	}
-	
+
 	public String getContactId() {
 		return contactId;
 	}
@@ -53,21 +52,13 @@ public class LocalContact {
 			adapter.notifyDataSetChanged();
 		}
 	}
-	
+
 	public Uri getContactUri() {
 		return contactUri;
 	}
 
 	public void setContactUri(Uri contactUri) {
 		this.contactUri = contactUri;
-	}
-	
-	public boolean isInsertedInDatabase() {
-		return isInsertedInDatabase;
-	}
-
-	public void setInsertedInDatabase(boolean isInsertedInDatabase) {
-		this.isInsertedInDatabase = isInsertedInDatabase;
 	}
 
 	public void setAdapter(BaseAdapter adapter) {
