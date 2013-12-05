@@ -1,9 +1,27 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.facebookcontact;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.protocol.BasicHttpContext;
+import org.apache.http.protocol.HttpContext;
 import org.brickred.customadapter.ImageLoader;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.facebook.Request;
 import com.facebook.Response;
@@ -15,10 +33,15 @@ import com.facebook.widget.ProfilePictureView;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -43,6 +66,14 @@ public class FacebookFriendListFragment extends Fragment implements
 
 	// database helper
 	private static TrustEvaluationDbHelper mDbHelper = null;
+
+	// shared preferences for storing my user id
+	private static SharedPreferences mSharedPreferences;
+	private static final String PREF_NAME = "facebook_fragment_preferences";
+	private static final String PREF_USER_ID = "user_id";
+
+	// user id
+	private String userId = null;
 
 	// ui lifecycle helper
 	private UiLifecycleHelper uiHelper;
@@ -75,6 +106,13 @@ public class FacebookFriendListFragment extends Fragment implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// get shared preferences
+		mSharedPreferences = getActivity().getSharedPreferences(PREF_NAME,
+				Context.MODE_PRIVATE);
+
+		// get user id from shared preferences
+		userId = mSharedPreferences.getString(PREF_USER_ID, null);
 
 		// create ui lifecycle helper instance
 		uiHelper = new UiLifecycleHelper(getActivity(), callback);
@@ -133,9 +171,18 @@ public class FacebookFriendListFragment extends Fragment implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getTitle().equals(getResources().getString(R.string.logout))) {
-			// log out
+			// log out flow
+			// destroy session
 			Session.getActiveSession().closeAndClearTokenInformation();
 
+			// clear table
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			mDbHelper
+					.clearTable(TrustEvaluationDataContract.FacebookContact.TABLE_NAME);
+
+			// toggle views
 			proceedBySession(Session.getActiveSession(), false);
 
 			return true;
@@ -161,6 +208,11 @@ public class FacebookFriendListFragment extends Fragment implements
 			// show the progress dialog
 			ListContactSplittedActivity.mProgressDialog.show();
 
+			// get my user id
+			if (userId == null) {
+				makeMeRequest(session);
+			}
+
 			if (mDbHelper == null) {
 				mDbHelper = new TrustEvaluationDbHelper(getActivity());
 			}
@@ -176,13 +228,18 @@ public class FacebookFriendListFragment extends Fragment implements
 					friendListView
 							.setAdapter(mPseudoFacebookGraphUserListAdapter);
 					getActivity().supportInvalidateOptionsMenu();
-					
+
 					// dismiss the progress dialog
 					ListContactSplittedActivity.mProgressDialog.dismiss();
-					
+
 					return;
 				}
 			}
+
+			// update flow
+			// clear table and re-request data
+			mDbHelper
+					.clearTable(TrustEvaluationDataContract.FacebookContact.TABLE_NAME);
 
 			// get friend list from remote request
 			makeNewMyFriendRequest(session);
@@ -195,6 +252,31 @@ public class FacebookFriendListFragment extends Fragment implements
 		}
 
 		getActivity().supportInvalidateOptionsMenu();
+	}
+
+	private void makeMeRequest(final Session session) {
+		// Make an API call to get user data and define a
+		// new callback to handle the response.
+		Request request = Request.newMeRequest(session,
+				new Request.GraphUserCallback() {
+					@Override
+					public void onCompleted(GraphUser user, Response response) {
+						// If the response is successful
+						if (session == Session.getActiveSession()) {
+							if (user != null) {
+								// store the user id
+								userId = user.getId();
+								Editor e = mSharedPreferences.edit();
+								e.putString(PREF_USER_ID, userId);
+								e.commit();
+							}
+						}
+						if (response.getError() != null) {
+
+						}
+					}
+				});
+		request.executeAsync();
 	}
 
 	private void makeNewMyFriendRequest(final Session session) {
@@ -221,9 +303,12 @@ public class FacebookFriendListFragment extends Fragment implements
 								friendListView
 										.setAdapter(mGraphUserListAdapter);
 							}
-							
+
 							// dismiss the progress dialog
-							ListContactSplittedActivity.mProgressDialog.dismiss();
+							ListContactSplittedActivity.mProgressDialog
+									.dismiss();
+
+							new FacebookCommonFriendsLoader().execute(users);
 						}
 						if (response.getError() != null) {
 							// TODO: handle error
@@ -371,6 +456,89 @@ public class FacebookFriendListFragment extends Fragment implements
 			}
 			return view;
 		}
+	}
+
+	private class FacebookCommonFriendsLoader extends
+			AsyncTask<List<GraphUser>, Void, Map<String, String>> {
+
+		private static final String TAG = "FacebookCommonFriendsLoader";
+
+		@Override
+		protected Map<String, String> doInBackground(List<GraphUser>... users) {
+			Session activeSession = Session.getActiveSession();
+			if (activeSession == null || activeSession.isClosed()) {
+				return null;
+			}
+
+			// prepare for http request
+			String accessToken = activeSession.getAccessToken();
+			String limit = "5000";
+			String offset = "0";
+			HttpClient httpClient = new DefaultHttpClient();
+			HttpContext localContext = new BasicHttpContext();
+			HttpGet httpGet = new HttpGet();
+
+			Map<String, String> commonFriendLists = new HashMap<String, String>();
+
+			Iterator<GraphUser> i = users[0].iterator();
+			while (i.hasNext()) {
+				// form the http query
+				String id = i.next().getId();
+				String query = "https://graph.facebook.com/" + userId
+						+ "/mutualfriends?limit=" + limit + "&offset=" + offset
+						+ "&user=" + id + "&access_token=" + accessToken;
+				httpGet.setURI(URI.create(query));
+
+				try {
+					// do get the json response
+					HttpResponse response = httpClient.execute(httpGet,
+							localContext);
+					JSONObject mJSONObject = new JSONObject(
+							Utils.getASCIIContentFromEntity(response
+									.getEntity()));
+					JSONArray dataArray = mJSONObject.getJSONArray("data");
+
+					// parse json
+					String result = "";
+					for (int j = 0; j < dataArray.length(); j++) {
+						JSONObject data = dataArray.getJSONObject(j);
+						result += data.getString("id");
+						if (j != dataArray.length() - 1) {
+							result += ";";
+						}
+					}
+					Log.v(TAG, "result string: " + result);
+
+					commonFriendLists.put(id, result);
+
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (IllegalStateException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+
+			return commonFriendLists;
+		}
+
+		@Override
+		protected void onPostExecute(Map<String, String> results) {
+			if (results == null || results.size() == 0) {
+				return;
+			}
+
+			// update database
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			mDbHelper.updateCommonFriendList(results,
+					ListContactSplittedActivity.FACEBOOK);
+		}
+
 	}
 
 }

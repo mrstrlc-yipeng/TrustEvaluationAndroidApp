@@ -5,23 +5,24 @@ import android.widget.BaseAdapter;
 
 public class LocalContact {
 	private String contactId;
-	
+
 	private String displayName;
 
 	private String contactDetail;
-	
+
 	private Uri contactUri = null;
 
 	private BaseAdapter adapter;
 
-	public LocalContact(String contactId, String displayName, String contactDetail, Uri contactUri) {
+	public LocalContact(String contactId, String displayName,
+			String contactDetail, Uri contactUri) {
 		super();
 		this.contactId = contactId;
 		this.displayName = displayName;
 		this.contactDetail = contactDetail;
 		this.contactUri = contactUri;
 	}
-	
+
 	public String getContactId() {
 		return contactId;
 	}
@@ -51,7 +52,7 @@ public class LocalContact {
 			adapter.notifyDataSetChanged();
 		}
 	}
-	
+
 	public Uri getContactUri() {
 		return contactUri;
 	}

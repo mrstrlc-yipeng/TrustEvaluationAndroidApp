@@ -1,22 +1,35 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.twittercontact;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.brickred.customadapter.ImageLoader;
+import org.brickred.customui.CustomUI;
+import org.brickred.customui.ProfileActivity;
 import org.brickred.socialauth.Contact;
+import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
+import org.brickred.socialauth.util.Response;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -46,6 +59,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	private static SharedPreferences mSharedPreferences;
 	private static final String PREF_NAME = "twitter_fragment_preferences";
 	private static final String PREF_IS_FIRST_VISIT = "is_first_visit";
+	private static final String PREF_FRIEND_LIST_JSON = "friend_list_json";
 
 	// is first visit
 	private boolean isFirstVisit = true;
@@ -65,6 +79,12 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	// whether the authorization (adapter.authorize(...)) is for retrieving
 	// contacts or just for the assignment of adapter (used in logout flow)
 	private boolean isAuthorizationForContacts = true;
+
+	// Twitter REST API rate limit between every 2 requests (average in
+	// millisecond, for example, a bucket that limit 15 requests in 15 minutes
+	// means the average rate limit is 1 request per minute, this rate limit
+	// equals 60000 millisecond between 2 requests)
+	private static final long API_RATE_LIMIT = 60000;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -92,8 +112,6 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		super.onCreateView(inflater, container, savedInstanceState);
 		View view = inflater.inflate(R.layout.fragment_twitter_friend_list,
 				container, false);
-
-		Log.v(TAG, "Creating view...");
 
 		// get login button view
 		loginButton = (Button) view.findViewById(R.id.login_button);
@@ -130,7 +148,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		if (item.getTitle().equals(getResources().getString(R.string.logout))) {
 			// log out
 			proceedLogout();
-			
+
 			// re-create options menu
 			getActivity().supportInvalidateOptionsMenu();
 
@@ -168,6 +186,13 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			proceed();
 			break;
 		case R.id.update_button:
+			// update flow
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			// clear table and re-proceed the data retrieve and data insert
+			mDbHelper
+					.clearTable(TrustEvaluationDataContract.TwitterContact.TABLE_NAME);
 			proceed();
 			break;
 		default:
@@ -191,8 +216,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		if (adapter == null) {
 			adapter = new SocialAuthAdapter(new ResponseListener());
 		}
-		adapter.addCallBack(Provider.TWITTER,
-				"http://txtrustevaluation.easyredmine.com");
+		adapter.addCallBack(Provider.TWITTER, "http://www.utt.fr");
 		adapter.authorize(getActivity(), Provider.TWITTER);
 	}
 
@@ -201,7 +225,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		// retrieving contacts
 		isAuthorizationForContacts = false;
 		proceed();
-		
+
 		ListContactSplittedActivity.mProgressDialog.dismiss();
 
 		// sign out via adapter
@@ -214,12 +238,20 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		e.commit();
 
 		toggleView();
+
+		// clear table
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		mDbHelper
+				.clearTable(TrustEvaluationDataContract.TwitterContact.TABLE_NAME);
 	}
 
 	private final class ResponseListener implements DialogListener {
 
 		@Override
 		public void onComplete(Bundle values) {
+			Log.v(TAG, "twitter fragment progress dialog shown");
 			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
 				// set "is_first_visit" to false
@@ -229,7 +261,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 				e.commit();
 
 				toggleView();
-				
+
 				getActivity().supportInvalidateOptionsMenu();
 
 				// contact list
@@ -261,7 +293,6 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		@Override
 		public void onExecute(String provider, List<Contact> t) {
-			Log.d(TAG, "Receiving Data");
 			List<Contact> contactsList = t;
 
 			if (contactsList != null && contactsList.size() > 0) {
@@ -271,8 +302,12 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
-			
+
 			ListContactSplittedActivity.mProgressDialog.dismiss();
+
+			if (contactsList != null) {
+				new TwitterCommonFriendsLoader().execute(contactsList);
+			}
 		}
 
 		@Override
@@ -287,7 +322,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		public TwitterContactAdapter(Context context, int textViewResourceId,
 				List<Contact> contacts) {
-			super(context, textViewResourceId);
+			super(context, textViewResourceId, contacts);
 
 			this.contacts = contacts;
 			imageLoader = new ImageLoader(context);
@@ -300,7 +335,6 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent) {
-			Log.v(TAG, "Creating view...");
 			View view = convertView;
 			if (view == null) {
 				LayoutInflater inflater = (LayoutInflater) getActivity()
@@ -318,11 +352,114 @@ public class TwitterFriendListFragment2 extends Fragment implements
 				TextView t = (TextView) view.findViewById(R.id.contact_name);
 				t.setText(listElement.getFirstName());
 			}
-			Log.v(TAG, "element ok");
 
 			return view;
 		}
 
+	}
+
+	private class TwitterCommonFriendsLoader extends
+			AsyncTask<List<Contact>, Void, Map<String, String>> {
+
+		@Override
+		protected Map<String, String> doInBackground(List<Contact>... args) {
+			if (adapter == null) {
+				return null;
+			}
+
+			final List<Contact> contactList = args[0];
+
+			// load my friend list json string at first
+			String myFriendListJSONString = mSharedPreferences.getString(
+					PREF_FRIEND_LIST_JSON, null);
+
+			if (myFriendListJSONString == null) {
+				// get my friend list string by rejoin the arraylist of contacts
+				// into string
+				StringBuilder mStringBuilder = new StringBuilder();
+				mStringBuilder.append("{\"ids\":[");
+				Iterator<Contact> i = contactList.iterator();
+				while (i.hasNext()) {
+					Contact contact = i.next();
+					mStringBuilder.append('"');
+					mStringBuilder.append(contact.getId());
+					mStringBuilder.append('"');
+					if (contactList.indexOf(contact) != contactList.size() - 1) {
+						mStringBuilder.append(',');
+					}
+				}
+				mStringBuilder.append("]}");
+				myFriendListJSONString = mStringBuilder.toString();
+				Log.v(TAG, "my friend list string: " + myFriendListJSONString);
+			}
+
+			final String myFriendListJSONStringPassedToTime = myFriendListJSONString;
+
+			final Map<String, String> commonFriendListMap = new HashMap<String, String>();
+
+			// generate common friend list for each contact, respecting the rate
+			// limit of Twitter REST API
+			final String requestMethod = "GET";
+			final Timer mTimer = new Timer();
+			mTimer.scheduleAtFixedRate(new TimerTask() {
+
+				int contactListIndex = 0;
+
+				@Override
+				public void run() {
+					if (contactListIndex == contactList.size()) {
+						mTimer.cancel();
+					}
+
+					Contact contact = contactList.get(contactListIndex);
+					String requestURL = "https://api.twitter.com/1.1/friends/ids.json?user_id=" + contact.getId();
+
+					// do request via REST API
+					try {
+						// get response of the request
+						Response contactFriendListResponse = adapter.api(
+								requestURL, requestMethod, null, null, null);
+
+						// parse response to JSON string
+						String contactFriendListJSONString = contactFriendListResponse
+								.getResponseBodyAsString("UTF-8");
+						Log.v(TAG, "contactFriendListJSONString: "
+								+ contactFriendListJSONString);
+
+						// generate common friend list string
+						String commonFriendListString = Utils
+								.generateCommonFriendListStringByJSONString(
+										myFriendListJSONStringPassedToTime,
+										contactFriendListJSONString, "ids", ';');
+						Log.v(TAG, "common friend list string: "
+								+ commonFriendListString);
+						commonFriendListMap.put(contact.getId(),
+								commonFriendListString);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					contactListIndex++;
+				}
+
+			}, API_RATE_LIMIT, API_RATE_LIMIT);
+
+			return commonFriendListMap;
+		}
+
+		@Override
+		protected void onPostExecute(Map<String, String> results) {
+			if (results == null || results.size() == 0) {
+				return;
+			}
+
+			// update database
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			mDbHelper.updateCommonFriendList(results,
+					ListContactSplittedActivity.TWITTER);
+		}
 	}
 
 }

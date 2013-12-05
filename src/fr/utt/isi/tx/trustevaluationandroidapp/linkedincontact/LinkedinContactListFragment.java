@@ -12,6 +12,7 @@ import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
 import android.content.Context;
@@ -61,7 +62,7 @@ public class LinkedinContactListFragment extends Fragment implements
 
 	// update button view
 	private Button updateButton;
-	
+
 	// whether the authorization (adapter.authorize(...)) is for retrieving
 	// contacts or just for the assignment of adapter (used in logout flow)
 	private boolean isAuthorizationForContacts = true;
@@ -127,7 +128,7 @@ public class LinkedinContactListFragment extends Fragment implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getTitle().equals(getResources().getString(R.string.logout))) {
-			// log out
+			// log out flow
 			proceedLogout();
 
 			// recreate options menu
@@ -167,6 +168,13 @@ public class LinkedinContactListFragment extends Fragment implements
 			proceed();
 			break;
 		case R.id.update_button:
+			// update flow
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			// clear table and re-proceed the data retrieve and data insert
+			mDbHelper
+					.clearTable(TrustEvaluationDataContract.LinkedinContact.TABLE_NAME);
 			proceed();
 			break;
 		default:
@@ -198,7 +206,7 @@ public class LinkedinContactListFragment extends Fragment implements
 		// retrieving contacts
 		isAuthorizationForContacts = false;
 		proceed();
-		
+
 		ListContactSplittedActivity.mProgressDialog.dismiss();
 
 		// sign out via adapter
@@ -211,6 +219,13 @@ public class LinkedinContactListFragment extends Fragment implements
 		e.commit();
 
 		toggleView();
+
+		// clear table
+		if (mDbHelper == null) {
+			mDbHelper = new TrustEvaluationDbHelper(getActivity());
+		}
+		mDbHelper
+				.clearTable(TrustEvaluationDataContract.LinkedinContact.TABLE_NAME);
 	}
 
 	private final class ResponseListener implements DialogListener {
@@ -226,7 +241,7 @@ public class LinkedinContactListFragment extends Fragment implements
 				e.commit();
 
 				toggleView();
-				
+
 				getActivity().supportInvalidateOptionsMenu();
 
 				// contact list
@@ -269,7 +284,7 @@ public class LinkedinContactListFragment extends Fragment implements
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
-			
+
 			ListContactSplittedActivity.mProgressDialog.dismiss();
 		}
 
@@ -285,7 +300,7 @@ public class LinkedinContactListFragment extends Fragment implements
 
 		public LinkedinContactAdapter(Context context, int textViewResourceId,
 				List<Contact> contacts) {
-			super(context, textViewResourceId);
+			super(context, textViewResourceId, contacts);
 
 			this.contacts = contacts;
 			imageLoader = new ImageLoader(context);
@@ -310,7 +325,8 @@ public class LinkedinContactListFragment extends Fragment implements
 			if (listElement != null) {
 				// profile image
 				ImageView i = (ImageView) view.findViewById(R.id.contact_image);
-				//imageLoader.DisplayImage("http://graph.facebook.com/100000524380683/picture", i);
+				// imageLoader.DisplayImage("http://graph.facebook.com/100000524380683/picture",
+				// i);
 				imageLoader.DisplayImage(listElement.getProfileImageURL(), i);
 
 				// profile full name
