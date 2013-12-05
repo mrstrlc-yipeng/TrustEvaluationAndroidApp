@@ -39,7 +39,7 @@
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity"
+            android:name="fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity"
             android:label="@string/app_name"
             android:parentActivityName="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" >
             <meta-data
@@ -58,7 +58,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="fr.utt.isi.tx.trustevaluationandroidapp.ListContactMergedActivity"
+            android:name="fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactMergedActivity"
             android:label="@string/app_name"
             android:parentActivityName="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" >
             <meta-data

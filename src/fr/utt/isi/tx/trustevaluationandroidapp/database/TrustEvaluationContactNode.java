@@ -8,8 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
-import fr.utt.isi.tx.trustevaluationandroidapp.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.matching.MergedContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
 
 public class TrustEvaluationContactNode {
 	private static final String TAG = "TrustEvaluationContactNode";
@@ -55,10 +55,10 @@ public class TrustEvaluationContactNode {
 		return isInserted;
 	}
 
-	public MergedContact generateMergedContact(int contactType, String name) {
+	public MergedContactNode generateMergedContact(int contactType, String name) {
 		Log.v(TAG, "generating merged contact..");
 
-		MergedContact contact = new MergedContact();
+		MergedContactNode contact = new MergedContactNode();
 
 		contact.setDisplayNameGlobal(name);
 		contact.setSourceScore(0);
@@ -112,7 +112,7 @@ public class TrustEvaluationContactNode {
 		return contact;
 	}
 
-	public void insertContactNode(MergedContact contact) {
+	public void insertContactNode(MergedContactNode contact) {
 		Log.v(TAG, "inserting contactNode..");
 
 		if (writable == null) {
@@ -140,7 +140,7 @@ public class TrustEvaluationContactNode {
 		writable.endTransaction();
 	}
 
-	public void updateContactNode(int contactType, MergedContact mergedContact) {
+	public void updateContactNode(int contactType, MergedContactNode mergedContact) {
 		if (writable == null) {
 			writable = mDbHelper.getWritableDatabase();
 		}
@@ -186,12 +186,12 @@ public class TrustEvaluationContactNode {
 		writable.endTransaction();
 	}
 
-	public List<MergedContact> getMergedContacts(String sortOrder) {
+	public List<MergedContactNode> getMergedContacts(String sortOrder) {
 		if (readable == null) {
 			readable = mDbHelper.getReadableDatabase();
 		}
 
-		List<MergedContact> contacts = new ArrayList<MergedContact>();
+		List<MergedContactNode> contacts = new ArrayList<MergedContactNode>();
 
 		Cursor c = readable.query(tableName, null, null, null, null, null,
 				sortOrder);
@@ -199,7 +199,7 @@ public class TrustEvaluationContactNode {
 			contacts = null;
 		} else {
 			while (c.moveToNext()) {
-				MergedContact contact = new MergedContact();
+				MergedContactNode contact = new MergedContactNode();
 				contact.setDisplayNameGlobal(c.getString(c
 						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL)));
 				contact.setSourceScore(c.getInt(c
@@ -225,7 +225,7 @@ public class TrustEvaluationContactNode {
 
 	}
 
-	public void calculateSourceScore(MergedContact contact) {
+	public void calculateSourceScore(MergedContactNode contact) {
 		Log.v(TAG, "calculating source score...");
 
 		int score = 0;
