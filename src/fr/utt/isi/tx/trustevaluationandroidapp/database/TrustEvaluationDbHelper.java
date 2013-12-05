@@ -27,6 +27,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 	// increase database version when database schema changes
 	public static final int DATABASE_VERSION = 29;
+
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
 	public static final String[] TABLE_NAMES = {

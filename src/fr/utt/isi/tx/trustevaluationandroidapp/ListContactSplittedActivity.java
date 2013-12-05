@@ -28,7 +28,7 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 		ActionBar.TabListener {
 
 	// tag for log
-	public static final String TAG = "ListContactSplittedActivity";
+	private static final String TAG = "ListContactSplittedActivity";
 
 	// key of contact type passed in bundles
 	public static final String KEY_CONTACT_TYPE = "contact_type";
