@@ -8,10 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import org.brickred.customadapter.ImageLoader;
-import org.brickred.customui.CustomUI;
-import org.brickred.customui.ProfileActivity;
 import org.brickred.socialauth.Contact;
-import org.brickred.socialauth.Profile;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthError;
@@ -20,16 +17,12 @@ import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 import org.brickred.socialauth.util.Response;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.string;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.AsyncTask;
@@ -254,9 +247,10 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		@Override
 		public void onComplete(Bundle values) {
-			Log.v(TAG, "twitter fragment progress dialog shown");
-			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
+				Log.v(TAG, "twitter fragment progress dialog shown");
+				ListContactSplittedActivity.mProgressDialog.show();
+				
 				// set "is_first_visit" to false
 				isFirstVisit = false;
 				Editor e = mSharedPreferences.edit();
@@ -294,6 +288,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	private final class ContactDataListener implements
 			SocialAuthListener<List<Contact>> {
 
+		@SuppressWarnings("unchecked")
 		@Override
 		public void onExecute(String provider, List<Contact> t) {
 			List<Contact> contactsList = t;
@@ -309,7 +304,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			ListContactSplittedActivity.mProgressDialog.dismiss();
 
 			if (contactsList != null) {
-				new TwitterCommonFriendsLoader().execute(contactsList);
+				//new TwitterCommonFriendsLoader().execute(contactsList);
 			}
 		}
 

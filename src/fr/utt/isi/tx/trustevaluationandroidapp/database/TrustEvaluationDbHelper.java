@@ -26,7 +26,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 29;
+	public static final int DATABASE_VERSION = 38;
 
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
@@ -360,7 +360,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
-				+ " VALUES (?,?,?,?,?,?,?)";
+				+ " VALUES (?,?,?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -457,14 +457,10 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 
 		// the query
-		String query = "UPDATE "
-				+ tableName
-				+ " SET "
-				+ commonFriendListColumnName
-				+ "=? WHERE "
-				+ contactIdColumnName
-				+ "=?";
-		
+		String query = "UPDATE " + tableName + " SET "
+				+ commonFriendListColumnName + "=? WHERE "
+				+ contactIdColumnName + "=?";
+
 		// do statement by transaction
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
@@ -475,12 +471,127 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			Log.v(TAG, "key: " + contactId + ", value: " + commonFriendList);
 
 			statement.clearBindings();
-			statement.bindString(1, contactId);
-			statement.bindString(2, commonFriendList);
+			statement.bindString(1, commonFriendList);
+			statement.bindString(2, contactId);
 			statement.execute();
 		}
 
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+	}
+
+	public void calculateTrustIndex() { // for now, facebook only
+		if (readable == null) {
+			readable = this.getReadableDatabase();
+		}
+
+		// parameters for select query of common friend list strings
+		String tableName = TrustEvaluationDataContract.FacebookContact.TABLE_NAME;
+		String[] columns = {
+				TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID,
+				TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST,
+				TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_IS_INDEXED };
+		String selection = TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST
+				+ " <> ?";// + " AND " + TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_IS_INDEXED + " = ?";
+		String[] selectionArgs = new String[] { "" };
+		Cursor c = readable.query(tableName, columns, selection, selectionArgs,
+				null, null, null, null);
+
+		if (c.getCount() == 0) {
+			Log.d(TAG, "no common friends for calculation of trust index");
+			return;
+		}
+		
+		if (writable == null) {
+			writable = this.getWritableDatabase();
+		}
+
+		// statement for update query of trust index score
+		String query = "UPDATE "
+				+ TrustEvaluationDataContract.ContactNode.TABLE_NAME
+				+ " SET "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE
+				+ "=? WHERE "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID
+				+ "=?";
+
+		// do statement by transaction
+		SQLiteStatement statement = writable.compileStatement(query);
+		writable.beginTransaction();
+
+		// parameters for select query of summary of source score of each
+		// facebook friend
+		// who has common friends with me
+		tableName = TrustEvaluationDataContract.ContactNode.TABLE_NAME;
+		columns = new String[] { "SUM("
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_SOURCE_SCORE
+				+ ")" };
+
+		while (c.moveToNext()) {
+			if (c.getInt(c.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_IS_INDEXED)) == 1) {
+				Log.v(TAG, "object indexed, pass to next.");
+				continue;
+			}
+			// clear clause
+			selection = "";
+			selectionArgs = new String[] {};
+
+			// get necessary fields for summary query
+			String facebookId = c
+					.getString(c
+							.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID));
+			String[] facebookCommonFriendList = c
+					.getString(
+							c.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST))
+					.split(";");
+
+			// selection clause and its arguments
+			StringBuilder selectionStringBuilder = new StringBuilder();
+			ArrayList<String> selectionArgsArrayList = new ArrayList<String>();
+
+			for (int i = 0; i < facebookCommonFriendList.length; i++) {
+				// Log.v(TAG, facebookId + ", " + facebookCommonFriendList[i]);
+
+				// selection clause
+				selectionStringBuilder
+						.append(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID
+								+ " = ?");
+				if (i != facebookCommonFriendList.length - 1) {
+					selectionStringBuilder.append(" OR ");
+				}
+
+				// selection arguments
+				selectionArgsArrayList.add(facebookCommonFriendList[i]);
+			}
+
+			// convert the selection clause and its arguments
+			selection = selectionStringBuilder.toString();
+			Log.v(TAG, "selection string: " + selection);
+			selectionArgs = selectionArgsArrayList.toArray(selectionArgs);
+			for (int i = 0; i < selectionArgs.length; i++) {
+				Log.v(TAG, "selection args: " + selectionArgs[i]);
+			}
+
+			// do the query and obtain the trust index score
+			Cursor cIndex = readable.query(tableName, columns, selection,
+					selectionArgs, null, null, null);
+			int trustIndexScore = 0;
+			if (cIndex.moveToNext()) {
+				Log.v(TAG, "id:" + facebookId + ", index: " + cIndex.getInt(0));
+				trustIndexScore = cIndex.getInt(0);
+			}
+			cIndex.close();
+			
+			// update the index score to corresponding facebook account in contact node
+			statement.clearBindings();
+			statement.bindLong(1, trustIndexScore);
+			statement.bindString(2, facebookId);
+			statement.execute();
+		}
+		
+		writable.setTransactionSuccessful();
+		writable.endTransaction();
+		
+		c.close();
 	}
 }

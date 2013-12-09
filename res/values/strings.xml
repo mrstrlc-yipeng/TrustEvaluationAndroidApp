@@ -11,9 +11,12 @@
     <string name="settings">Settings</string>
     <string name="button_list_1">List 1</string>
     <string name="button_list_2">List 2</string>
+    <string name="button_list_3">List 3</string>
     <string name="twitter_login_button_text">Log in with Twitter</string>
     <string name="linkedin_login_button_text">Log in with LinkedIn</string>
     <string name="button_update">Update</string>
     <string name="logout">Log out</string>
+    <string name="title_activity_list_contact_indexed">ListContactIndexedActivity</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

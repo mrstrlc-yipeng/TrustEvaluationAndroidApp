@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;

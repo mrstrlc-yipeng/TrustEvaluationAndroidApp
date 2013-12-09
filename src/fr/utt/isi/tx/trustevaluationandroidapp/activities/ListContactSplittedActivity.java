@@ -6,8 +6,6 @@ import com.facebook.UiLifecycleHelper;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.MainActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
 import fr.utt.isi.tx.trustevaluationandroidapp.fragments.FacebookFriendListFragment;
 import fr.utt.isi.tx.trustevaluationandroidapp.fragments.LinkedinContactListFragment;
 import fr.utt.isi.tx.trustevaluationandroidapp.fragments.LocalEmailListFragment;

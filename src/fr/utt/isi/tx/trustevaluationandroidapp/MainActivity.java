@@ -1,5 +1,6 @@
 package fr.utt.isi.tx.trustevaluationandroidapp;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactIndexedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactMergedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import android.os.Bundle;
@@ -18,7 +19,7 @@ public class MainActivity extends Activity implements OnClickListener {
 	private static final String TAG = "MainActivity";
 
 	public static final String EXTRA_CONTACT_TYPE = "contact_type";
-	
+
 	public static ProgressDialog mProgressDialog;
 
 	@Override
@@ -26,16 +27,19 @@ public class MainActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		Log.v(TAG, "creating activity...");
 		setContentView(R.layout.activity_main);
-		
+
 		mProgressDialog = new ProgressDialog(this);
 		mProgressDialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		mProgressDialog.setMessage("Loading...");
-		
-		Button button_list_1 = (Button) findViewById(R.id.button_list_1);
-		button_list_1.setOnClickListener(this);
-		
-		Button button_list_2 = (Button) findViewById(R.id.button_list_2);
-		button_list_2.setOnClickListener(this);
+
+		Button buttonList1 = (Button) findViewById(R.id.button_list_1);
+		buttonList1.setOnClickListener(this);
+
+		Button buttonList2 = (Button) findViewById(R.id.button_list_2);
+		buttonList2.setOnClickListener(this);
+
+		Button buttonList3 = (Button) findViewById(R.id.button_list_3);
+		buttonList3.setOnClickListener(this);
 	}
 
 	@Override
@@ -54,6 +58,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.button_list_2:
 			startActivity(new Intent(this, ListContactMergedActivity.class));
+			break;
+		case R.id.button_list_3:
+			startActivity(new Intent(this, ListContactIndexedActivity.class));
 			break;
 		default:
 			break;

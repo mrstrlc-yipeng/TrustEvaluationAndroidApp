@@ -1,16 +1,12 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.fragments;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -32,9 +28,6 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.string;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
@@ -287,6 +280,7 @@ public class FacebookFriendListFragment extends Fragment implements
 		Request request = Request.newMyFriendsRequest(session,
 				new Request.GraphUserListCallback() {
 
+					@SuppressWarnings("unchecked")
 					@Override
 					public void onCompleted(List<GraphUser> users,
 							Response response) {

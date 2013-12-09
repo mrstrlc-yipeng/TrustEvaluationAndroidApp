@@ -11,9 +11,6 @@ import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.string;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
@@ -235,8 +232,9 @@ public class LinkedinContactListFragment extends Fragment implements
 
 		@Override
 		public void onComplete(Bundle values) {
-			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
+				ListContactSplittedActivity.mProgressDialog.show();
+				
 				// set "is_first_visit" to false
 				isFirstVisit = false;
 				Editor e = mSharedPreferences.edit();
