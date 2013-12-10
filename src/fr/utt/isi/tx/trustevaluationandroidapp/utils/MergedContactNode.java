@@ -15,9 +15,23 @@ public class MergedContactNode extends Contact {
 	private int isFacebook;
 	private int isTwitter;
 	private int isLinkedin;
+	private String facebookId;
 
 	public MergedContactNode() {
 
+	}
+	
+	public MergedContactNode(String displayNameGlobal) {
+		super();
+		this.displayNameGlobal = displayNameGlobal;
+		this.sourceScore = 0;
+		this.trustScore = 0;
+		this.isLocalPhone = 0;
+		this.isLocalEmail = 0;
+		this.isFacebook = 0;
+		this.isTwitter = 0;
+		this.isLinkedin = 0;
+		this.facebookId = null;
 	}
 
 	public MergedContactNode(String displayNameGlobal, int sourceScore,
@@ -106,6 +120,14 @@ public class MergedContactNode extends Contact {
 
 	public void setIsLinkedin(int isLinkedin) {
 		this.isLinkedin = isLinkedin;
+	}
+
+	public String getFacebookId() {
+		return facebookId;
+	}
+
+	public void setFacebookId(String facebookId) {
+		this.facebookId = facebookId;
 	}
 
 }

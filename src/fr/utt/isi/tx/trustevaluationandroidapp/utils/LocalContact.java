@@ -36,10 +36,12 @@ public class LocalContact extends Contact {
 		this.contactId = contactId;
 	}
 
+	@Override
 	public String getDisplayName() {
 		return displayName;
 	}
 
+	@Override
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
 		if (adapter != null) {

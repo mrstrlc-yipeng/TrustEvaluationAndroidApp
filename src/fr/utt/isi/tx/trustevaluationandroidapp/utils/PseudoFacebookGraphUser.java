@@ -8,15 +8,15 @@ public class PseudoFacebookGraphUser extends Contact {
 
 	private String id;
 
-	private String name;
+	private String displayName;
 	
-	private String profileImageUrl;
+	private String profileImageURL;
 
-	public PseudoFacebookGraphUser(String id, String name, String profileImageUrl) {
+	public PseudoFacebookGraphUser(String id, String displayName, String profileImageURL) {
 		super();
 		this.id = id;
-		this.name = name;
-		this.profileImageUrl = profileImageUrl;
+		this.displayName = displayName;
+		this.profileImageURL = profileImageURL;
 	}
 
 	@Override
@@ -29,20 +29,24 @@ public class PseudoFacebookGraphUser extends Contact {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	@Override
+	public String getDisplayName() {
+		return displayName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	@Override
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
-	public String getProfileImageUrl() {
-		return profileImageUrl;
+	@Override
+	public String getProfileImageURL() {
+		return profileImageURL;
 	}
 
-	public void setProfileImageUrl(String profileImageUrl) {
-		this.profileImageUrl = profileImageUrl;
+	@Override
+	public void setProfileImageURL(String profileImageURL) {
+		this.profileImageURL = profileImageURL;
 	}
 
 }

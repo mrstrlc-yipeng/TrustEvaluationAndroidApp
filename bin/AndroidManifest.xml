@@ -64,7 +64,14 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" />
-
+        </activity>
+        <activity
+            android:name="fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactIndexedActivity"
+            android:label="@string/title_activity_list_contact_indexed"
+            android:parentActivityName="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" />
         </activity>
     </application>
 

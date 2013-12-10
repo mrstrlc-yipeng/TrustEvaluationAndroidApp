@@ -15,6 +15,20 @@ import android.util.Log;
 public class Utils {
 	
 	private static final String TAG = "Utils";
+	
+	public static String cleanDisplayName(String displayName) {
+		// clean display_name if its format is email
+		if (displayName.contains("@")) {
+			String[] split = displayName.split("@");			
+			displayName = split[0];
+		} 
+		
+		// clean all the characters other than letters
+		String newDisplayName1 = displayName.replaceAll("[1-9]", "");
+		String newDisplayName = newDisplayName1.replaceAll("[^a-zA-Z ]", " ");
+		
+		return newDisplayName;
+	}
 
 	public static String getASCIIContentFromEntity(HttpEntity entity)
 			throws IllegalStateException, IOException {

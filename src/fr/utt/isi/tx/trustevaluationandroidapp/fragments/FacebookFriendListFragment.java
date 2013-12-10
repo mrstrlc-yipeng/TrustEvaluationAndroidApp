@@ -1,16 +1,12 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.fragments;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -18,7 +14,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
-import org.brickred.customadapter.ImageLoader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -32,10 +27,9 @@ import com.facebook.model.GraphUser;
 import com.facebook.widget.ProfilePictureView;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.string;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.adapters.GraphUserListAdapter;
+import fr.utt.isi.tx.trustevaluationandroidapp.adapters.PseudoFacebookGraphUserListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
@@ -56,11 +50,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class FacebookFriendListFragment extends Fragment implements
 		OnClickListener {
@@ -102,10 +93,6 @@ public class FacebookFriendListFragment extends Fragment implements
 	private Button updateButtonView;
 
 	private HashMap<String, ProfilePictureView> mProfilePictureViews = null;
-
-	// adapters
-	private GraphUserListAdapter mGraphUserListAdapter = null;
-	private PseudoFacebookGraphUserListAdapter mPseudoFacebookGraphUserListAdapter = null;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -226,7 +213,7 @@ public class FacebookFriendListFragment extends Fragment implements
 				List<PseudoFacebookGraphUser> contacts = mDbHelper
 						.getFacebookContacts(null);
 				if (contacts != null) {
-					mPseudoFacebookGraphUserListAdapter = new PseudoFacebookGraphUserListAdapter(
+					PseudoFacebookGraphUserListAdapter mPseudoFacebookGraphUserListAdapter = new PseudoFacebookGraphUserListAdapter(
 							getActivity(), R.layout.facebook_friend_list,
 							contacts);
 					friendListView
@@ -287,6 +274,7 @@ public class FacebookFriendListFragment extends Fragment implements
 		Request request = Request.newMyFriendsRequest(session,
 				new Request.GraphUserListCallback() {
 
+					@SuppressWarnings("unchecked")
 					@Override
 					public void onCompleted(List<GraphUser> users,
 							Response response) {
@@ -301,7 +289,7 @@ public class FacebookFriendListFragment extends Fragment implements
 								mDbHelper.insertFacebookContacts(users);
 
 								// set adapter to list view
-								mGraphUserListAdapter = new GraphUserListAdapter(
+								GraphUserListAdapter mGraphUserListAdapter = new GraphUserListAdapter(
 										getActivity(),
 										R.id.facebook_friend_list, users);
 								friendListView
@@ -363,103 +351,6 @@ public class FacebookFriendListFragment extends Fragment implements
 	public void onDestroy() {
 		super.onDestroy();
 		uiHelper.onDestroy();
-	}
-
-	private class GraphUserListAdapter extends ArrayAdapter<GraphUser> {
-
-		private static final String TAG = "GraphUserListAdapter";
-
-		private List<GraphUser> listElements;
-
-		private ImageLoader imageLoader;
-
-		public GraphUserListAdapter(Context context, int resource,
-				List<GraphUser> listElements) {
-			super(context, resource, listElements);
-			this.listElements = listElements;
-			this.imageLoader = new ImageLoader(context);
-			Log.v(TAG, "list elements ok.");
-		}
-
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = convertView;
-			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater) getActivity()
-						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.facebook_friend_list, null);
-			}
-
-			GraphUser listElement = listElements.get(position);
-			if (listElement != null) {
-				// get facebook id
-				String facebookId = listElement.getId();
-
-				// form facebook profile picture url by facebook id
-				String facebookProfilePictureUrl = "http://graph.facebook.com/"
-						+ facebookId + "/picture";
-
-				// load profile picture
-				ImageView profilePictureView = (ImageView) view
-						.findViewById(R.id.profile_picture);
-				imageLoader.DisplayImage(facebookProfilePictureUrl,
-						profilePictureView);
-
-				// set profile name
-				TextView userNameView = (TextView) view
-						.findViewById(R.id.friend_list_user_name);
-				userNameView.setText(listElement.getName());
-			}
-			return view;
-		}
-
-	}
-
-	private class PseudoFacebookGraphUserListAdapter extends
-			ArrayAdapter<PseudoFacebookGraphUser> {
-		private static final String TAG = "PseudoFacebookGraphUserListAdapter";
-
-		private List<PseudoFacebookGraphUser> listElements;
-
-		private ImageLoader imageLoader;
-
-		public PseudoFacebookGraphUserListAdapter(Context context,
-				int resource, List<PseudoFacebookGraphUser> listElements) {
-			super(context, resource, listElements);
-			this.listElements = listElements;
-			this.imageLoader = new ImageLoader(context);
-			Log.v(TAG, "list elements ok.");
-		}
-
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = convertView;
-			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater) getActivity()
-						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.facebook_friend_list, null);
-			}
-
-			PseudoFacebookGraphUser listElement = listElements.get(position);
-			if (listElement != null) {
-				// get facebook id
-				String facebookId = listElement.getId();
-
-				// form facebook profile picture url by facebook id
-				String facebookProfilePictureUrl = "http://graph.facebook.com/"
-						+ facebookId + "/picture";
-
-				// load profile picture
-				ImageView profilePictureView = (ImageView) view
-						.findViewById(R.id.profile_picture);
-				imageLoader.DisplayImage(facebookProfilePictureUrl,
-						profilePictureView);
-
-				// set profile name
-				TextView userNameView = (TextView) view
-						.findViewById(R.id.friend_list_user_name);
-				userNameView.setText(listElement.getName());
-			}
-			return view;
-		}
 	}
 
 	private class FacebookCommonFriendsLoader extends

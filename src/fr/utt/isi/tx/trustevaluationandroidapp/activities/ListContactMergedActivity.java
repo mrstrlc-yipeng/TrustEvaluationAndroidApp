@@ -2,7 +2,6 @@ package fr.utt.isi.tx.trustevaluationandroidapp.activities;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.MainActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -31,10 +30,6 @@ public class ListContactMergedActivity extends ActionBarActivity {
 		
 		// get action bar by support library
 		final ActionBar actionBar = getSupportActionBar();
-
-		// set navigation mode to tab mode
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
 		actionBar.setDisplayShowHomeEnabled(true);
 		
 		MainActivity.mProgressDialog.dismiss();

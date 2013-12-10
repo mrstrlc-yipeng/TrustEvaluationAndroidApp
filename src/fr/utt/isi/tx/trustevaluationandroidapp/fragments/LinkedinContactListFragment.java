@@ -2,7 +2,6 @@ package fr.utt.isi.tx.trustevaluationandroidapp.fragments;
 
 import java.util.List;
 
-import org.brickred.customadapter.ImageLoader;
 import org.brickred.socialauth.Contact;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
@@ -11,10 +10,8 @@ import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.id;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.layout;
-import fr.utt.isi.tx.trustevaluationandroidapp.R.string;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.adapters.SocialAuthContactListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 
@@ -31,11 +28,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class LinkedinContactListFragment extends Fragment implements
 		OnClickListener {
@@ -155,8 +149,11 @@ public class LinkedinContactListFragment extends Fragment implements
 			// get contact list from database
 			List<Contact> contactList = mDbHelper.getLinkedinContacts(null);
 			if (contactList != null) {
-				friendList.setAdapter(new LinkedinContactAdapter(getActivity(),
-						R.layout.linkedin_contact_list, contactList));
+				SocialAuthContactListAdapter mAdapter = new SocialAuthContactListAdapter(
+						getActivity(), R.layout.linkedin_contact_list,
+						contactList);
+				mAdapter.setProvider(Provider.LINKEDIN);
+				friendList.setAdapter(mAdapter);
 				return;
 			}
 
@@ -235,8 +232,9 @@ public class LinkedinContactListFragment extends Fragment implements
 
 		@Override
 		public void onComplete(Bundle values) {
-			ListContactSplittedActivity.mProgressDialog.show();
 			if (isAuthorizationForContacts) {
+				ListContactSplittedActivity.mProgressDialog.show();
+
 				// set "is_first_visit" to false
 				isFirstVisit = false;
 				Editor e = mSharedPreferences.edit();
@@ -281,9 +279,15 @@ public class LinkedinContactListFragment extends Fragment implements
 			List<Contact> contactsList = t;
 
 			if (contactsList != null && contactsList.size() > 0) {
+				// update database
 				mDbHelper.insertLinkedinContact(contactsList);
-				friendList.setAdapter(new LinkedinContactAdapter(getActivity(),
-						R.layout.linkedin_contact_list, contactsList));
+
+				// set up the list view
+				SocialAuthContactListAdapter mAdapter = new SocialAuthContactListAdapter(
+						getActivity(), R.layout.linkedin_contact_list,
+						contactsList);
+				mAdapter.setProvider(Provider.LINKEDIN);
+				friendList.setAdapter(mAdapter);
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
@@ -297,50 +301,4 @@ public class LinkedinContactListFragment extends Fragment implements
 		}
 	}
 
-	private class LinkedinContactAdapter extends ArrayAdapter<Contact> {
-		List<Contact> contacts;
-		ImageLoader imageLoader;
-
-		public LinkedinContactAdapter(Context context, int textViewResourceId,
-				List<Contact> contacts) {
-			super(context, textViewResourceId, contacts);
-
-			this.contacts = contacts;
-			imageLoader = new ImageLoader(context);
-		}
-
-		@Override
-		public int getCount() {
-			return contacts.size();
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			Log.v(TAG, "Creating view...");
-			View view = convertView;
-			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater) getActivity()
-						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.linkedin_contact_list, null);
-			}
-
-			Contact listElement = contacts.get(position);
-			if (listElement != null) {
-				// profile image
-				ImageView i = (ImageView) view.findViewById(R.id.contact_image);
-				// imageLoader.DisplayImage("http://graph.facebook.com/100000524380683/picture",
-				// i);
-				imageLoader.DisplayImage(listElement.getProfileImageURL(), i);
-
-				// profile full name
-				TextView t = (TextView) view.findViewById(R.id.contact_name);
-				t.setText(listElement.getFirstName() + " "
-						+ listElement.getLastName());
-			}
-			Log.v(TAG, "element ok");
-
-			return view;
-		}
-
-	}
 }
