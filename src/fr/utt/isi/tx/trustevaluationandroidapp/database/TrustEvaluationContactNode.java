@@ -3,6 +3,8 @@ package fr.utt.isi.tx.trustevaluationandroidapp.database;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.brickred.socialauth.Contact;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -55,84 +57,73 @@ public class TrustEvaluationContactNode {
 		return isInserted;
 	}
 
-	public MergedContactNode generateMergedContact(int contactType, String name) {
+	public MergedContactNode generateMergedContact(int contactType,
+			Contact contact) {
 		Log.v(TAG, "generating merged contact..");
 
-		MergedContactNode contact = new MergedContactNode();
-
-		contact.setDisplayNameGlobal(name);
-		contact.setSourceScore(0);
-		contact.setTrustScore(0);
-
+		String name;
+		MergedContactNode contactNode;
 		switch (contactType) {
 		case ListContactSplittedActivity.LOCAL_PHONE:
-			contact.setIsLocalPhone(1);
-			contact.setIsLocalEmail(0);
-			contact.setIsFacebook(0);
-			contact.setIsTwitter(0);
-			contact.setIsLinkedin(0);
+			name = contact.getDisplayName();
+			contactNode = new MergedContactNode(name);
+			contactNode.setIsLocalPhone(1);
 			break;
 		case ListContactSplittedActivity.LOCAL_EMAIL:
-			contact.setIsLocalPhone(0);
-			contact.setIsLocalEmail(1);
-			contact.setIsFacebook(0);
-			contact.setIsTwitter(0);
-			contact.setIsLinkedin(0);
+			name = contact.getDisplayName();
+			contactNode = new MergedContactNode(name);
+			contactNode.setIsLocalEmail(1);
 			break;
 		case ListContactSplittedActivity.FACEBOOK:
-			contact.setIsLocalPhone(0);
-			contact.setIsLocalEmail(0);
-			contact.setIsFacebook(1);
-			contact.setIsTwitter(0);
-			contact.setIsLinkedin(0);
+			name = contact.getDisplayName();
+			contactNode = new MergedContactNode(name);
+			contactNode.setIsFacebook(1);
+			contactNode.setFacebookId(contact.getId());
 			break;
 		case ListContactSplittedActivity.TWITTER:
-			contact.setIsLocalPhone(0);
-			contact.setIsLocalEmail(0);
-			contact.setIsFacebook(0);
-			contact.setIsTwitter(1);
-			contact.setIsLinkedin(0);
+			name = contact.getFirstName();
+			contactNode = new MergedContactNode(name);
+			contactNode.setIsTwitter(1);
 			break;
 		case ListContactSplittedActivity.LINKEDIN:
-			contact.setIsLocalPhone(0);
-			contact.setIsLocalEmail(0);
-			contact.setIsFacebook(0);
-			contact.setIsTwitter(0);
-			contact.setIsLinkedin(1);
+			name = contact.getFirstName() + " " + contact.getLastName();
+			contactNode = new MergedContactNode(name);
+			contactNode.setIsLinkedin(1);
 			break;
 		default:
-			contact.setIsLocalPhone(0);
-			contact.setIsLocalEmail(0);
-			contact.setIsFacebook(0);
-			contact.setIsTwitter(0);
-			contact.setIsLinkedin(0);
-			break;
+			return null;
 		}
 
-		return contact;
+		return contactNode;
 	}
 
-	public void insertContactNode(MergedContactNode contact) {
+	public void insertContactNode(MergedContactNode contactNode) {
 		Log.v(TAG, "inserting contactNode..");
 
 		if (writable == null) {
 			writable = mDbHelper.getWritableDatabase();
 		}
 
-		String query = "INSERT INTO " + tableName + " VALUES (?,?,?,?,?,?,?,?)";
+		String query = "INSERT INTO " + tableName
+				+ " VALUES (?,?,?,?,?,?,?,?,?,?)";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
-		if (!isInsertedContactNode(contact.getDisplayNameGlobal())) {
+		if (!isInsertedContactNode(contactNode.getDisplayNameGlobal())) {
 			statement.clearBindings();
-			statement.bindString(1, contact.getDisplayNameGlobal());
-			statement.bindLong(2, contact.getSourceScore());
-			statement.bindLong(3, contact.getTrustScore());
-			statement.bindLong(4, contact.getIsLocalPhone());
-			statement.bindLong(5, contact.getIsLocalEmail());
-			statement.bindLong(6, contact.getIsFacebook());
-			statement.bindLong(7, contact.getIsTwitter());
-			statement.bindLong(8, contact.getIsLinkedin());
+			statement.bindString(2, contactNode.getDisplayNameGlobal());
+			statement.bindLong(3, contactNode.getSourceScore());
+			statement.bindLong(4, contactNode.getTrustScore());
+			statement.bindLong(5, contactNode.getIsLocalPhone());
+			statement.bindLong(6, contactNode.getIsLocalEmail());
+			statement.bindLong(7, contactNode.getIsFacebook());
+			statement.bindLong(8, contactNode.getIsTwitter());
+			statement.bindLong(9, contactNode.getIsLinkedin());
+			if (contactNode.getFacebookId() == null) {
+				statement.bindNull(10);
+			} else {
+				statement.bindString(10, contactNode.getFacebookId());
+			}
 			statement.execute();
 		}
 
@@ -140,46 +131,41 @@ public class TrustEvaluationContactNode {
 		writable.endTransaction();
 	}
 
-	public void updateContactNode(int contactType, MergedContactNode mergedContact) {
+	public void updateContactNode(int contactType,
+			MergedContactNode mergedContact) {
 		if (writable == null) {
 			writable = mDbHelper.getWritableDatabase();
-		}
-
-		String list = "";
-
-		switch (contactType) {
-		case ListContactSplittedActivity.LOCAL_PHONE:
-			list = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE;
-			break;
-		case ListContactSplittedActivity.LOCAL_EMAIL:
-			list = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL;
-			break;
-		case ListContactSplittedActivity.FACEBOOK:
-			list = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK;
-			break;
-		case ListContactSplittedActivity.TWITTER:
-			list = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER;
-			break;
-		case ListContactSplittedActivity.LINKEDIN:
-			list = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN;
-			break;
-		default:
-			break;
 		}
 
 		String query = "UPDATE "
 				+ tableName
 				+ " SET "
-				+ list
-				+ "=? WHERE "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE
+				+ "=? "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL
+				+ "=? "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK
+				+ "=? "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER
+				+ "=? "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN
+				+ "=? "
+				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID
+				+ "=? "
+				+ " WHERE "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL
 				+ "=?";
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
 		statement.clearBindings();
-		statement.bindLong(1, 1);
-		statement.bindString(2, mergedContact.getDisplayNameGlobal());
+		statement.bindLong(1, mergedContact.getIsLocalPhone());
+		statement.bindLong(2, mergedContact.getIsLocalEmail());
+		statement.bindLong(3, mergedContact.getIsFacebook());
+		statement.bindLong(4, mergedContact.getIsTwitter());
+		statement.bindLong(5, mergedContact.getIsLinkedin());
+		statement.bindString(6, mergedContact.getFacebookId());
+		statement.bindString(7, mergedContact.getDisplayNameGlobal());
 		statement.execute();
 
 		writable.setTransactionSuccessful();
@@ -216,6 +202,8 @@ public class TrustEvaluationContactNode {
 						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER)));
 				contact.setIsLinkedin(c.getInt(c
 						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN)));
+				contact.setFacebookId(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID)));
 				contacts.add(contact);
 			}
 		}

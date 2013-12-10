@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import org.brickred.customadapter.ImageLoader;
 import org.brickred.socialauth.Contact;
 import org.brickred.socialauth.android.DialogListener;
 import org.brickred.socialauth.android.SocialAuthAdapter;
@@ -18,6 +17,7 @@ import org.brickred.socialauth.util.Response;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.adapters.SocialAuthContactListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
@@ -36,11 +36,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 public class TwitterFriendListFragment2 extends Fragment implements
 		OnClickListener {
@@ -166,8 +163,11 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			// get contact list from database
 			List<Contact> contactList = mDbHelper.getTwitterContacts(null);
 			if (contactList != null) {
-				friendList.setAdapter(new TwitterContactAdapter(getActivity(),
-						R.layout.twitter_friend_list, contactList));
+				SocialAuthContactListAdapter mAdapter = new SocialAuthContactListAdapter(
+						getActivity(), R.layout.twitter_friend_list,
+						contactList);
+				mAdapter.setProvider(Provider.TWITTER);
+				friendList.setAdapter(mAdapter);
 				return;
 			}
 
@@ -250,7 +250,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			if (isAuthorizationForContacts) {
 				Log.v(TAG, "twitter fragment progress dialog shown");
 				ListContactSplittedActivity.mProgressDialog.show();
-				
+
 				// set "is_first_visit" to false
 				isFirstVisit = false;
 				Editor e = mSharedPreferences.edit();
@@ -294,9 +294,14 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			List<Contact> contactsList = t;
 
 			if (contactsList != null && contactsList.size() > 0) {
+				// update database
 				mDbHelper.insertTwitterContact(contactsList);
-				friendList.setAdapter(new TwitterContactAdapter(getActivity(),
-						R.layout.twitter_friend_list, contactsList));
+
+				// set up the list view
+				SocialAuthContactListAdapter mAdapter = new SocialAuthContactListAdapter(
+						getActivity(), R.layout.twitter_friend_list,
+						contactsList);
+				friendList.setAdapter(mAdapter);
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
@@ -304,7 +309,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 			ListContactSplittedActivity.mProgressDialog.dismiss();
 
 			if (contactsList != null) {
-				//new TwitterCommonFriendsLoader().execute(contactsList);
+				// new TwitterCommonFriendsLoader().execute(contactsList);
 			}
 		}
 
@@ -312,48 +317,6 @@ public class TwitterFriendListFragment2 extends Fragment implements
 		public void onError(SocialAuthError e) {
 
 		}
-	}
-
-	private class TwitterContactAdapter extends ArrayAdapter<Contact> {
-		List<Contact> contacts;
-		ImageLoader imageLoader;
-
-		public TwitterContactAdapter(Context context, int textViewResourceId,
-				List<Contact> contacts) {
-			super(context, textViewResourceId, contacts);
-
-			this.contacts = contacts;
-			imageLoader = new ImageLoader(context);
-		}
-
-		@Override
-		public int getCount() {
-			return contacts.size();
-		}
-
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent) {
-			View view = convertView;
-			if (view == null) {
-				LayoutInflater inflater = (LayoutInflater) getActivity()
-						.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				view = inflater.inflate(R.layout.twitter_friend_list, null);
-			}
-
-			Contact listElement = contacts.get(position);
-			if (listElement != null) {
-				// profile image
-				ImageView i = (ImageView) view.findViewById(R.id.contact_image);
-				imageLoader.DisplayImage(listElement.getProfileImageURL(), i);
-
-				// profile full name
-				TextView t = (TextView) view.findViewById(R.id.contact_name);
-				t.setText(listElement.getFirstName());
-			}
-
-			return view;
-		}
-
 	}
 
 	private class TwitterCommonFriendsLoader extends
@@ -410,7 +373,8 @@ public class TwitterFriendListFragment2 extends Fragment implements
 					}
 
 					Contact contact = contactList.get(contactListIndex);
-					String requestURL = "https://api.twitter.com/1.1/friends/ids.json?user_id=" + contact.getId();
+					String requestURL = "https://api.twitter.com/1.1/friends/ids.json?user_id="
+							+ contact.getId();
 
 					// do request via REST API
 					try {

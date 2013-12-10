@@ -1,5 +1,6 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.activities;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.MainActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import android.os.Bundle;
@@ -16,14 +17,12 @@ public class ListContactIndexedActivity extends ActionBarActivity {
 
 		// get action bar by support library
 		ActionBar actionBar = getSupportActionBar();
-
-		// set navigation mode to tab mode
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
 		actionBar.setDisplayShowHomeEnabled(true);
 		
 		TrustEvaluationDbHelper mDbHelper = new TrustEvaluationDbHelper(this);
 		mDbHelper.calculateTrustIndex();
+		
+		MainActivity.mProgressDialog.dismiss();
 	}
 
 	@Override
