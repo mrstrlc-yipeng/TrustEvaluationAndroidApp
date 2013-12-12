@@ -3,7 +3,6 @@ package fr.utt.isi.tx.trustevaluationandroidapp.adapters;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,8 +37,6 @@ public class ContactNodeListAdapter extends ArrayAdapter<MergedContactNode> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		Log.v(TAG, "Creating view...");
-
 		View view = convertView;
 		if (view == null) {
 			LayoutInflater inflater = (LayoutInflater) context
@@ -66,7 +63,6 @@ public class ContactNodeListAdapter extends ArrayAdapter<MergedContactNode> {
 			}
 			scoreView.setText("" + score);
 		}
-		Log.v(TAG, "element ok");
 
 		return view;
 	}

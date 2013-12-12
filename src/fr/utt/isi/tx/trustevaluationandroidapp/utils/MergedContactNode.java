@@ -22,7 +22,7 @@ public class MergedContactNode extends Contact {
 	}
 	
 	public MergedContactNode(String displayNameGlobal) {
-		super();
+		//super();
 		this.displayNameGlobal = displayNameGlobal;
 		this.sourceScore = 0;
 		this.trustScore = 0;

@@ -402,7 +402,7 @@ public class FacebookFriendListFragment extends Fragment implements
 							result += ";";
 						}
 					}
-					Log.v(TAG, "result string: " + result);
+					//Log.v(TAG, "result string: " + result);
 
 					commonFriendLists.put(id, result);
 

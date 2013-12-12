@@ -44,7 +44,7 @@ public class Utils {
 				out.append(new String(b, 0, n));
 		}
 		
-		Log.v(TAG, out.toString());
+		//Log.v(TAG, out.toString());
 
 		return out.toString();
 	}
