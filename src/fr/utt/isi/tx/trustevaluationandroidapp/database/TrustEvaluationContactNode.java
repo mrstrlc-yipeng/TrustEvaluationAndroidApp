@@ -142,19 +142,25 @@ public class TrustEvaluationContactNode {
 				+ " SET "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE
 				+ "=? "
+				+ ", "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL
 				+ "=? "
+				+ ", "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK
 				+ "=? "
+				+ ", "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER
 				+ "=? "
+				+ ", "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN
 				+ "=? "
+				+ ", "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID
 				+ "=? "
 				+ " WHERE "
 				+ TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL
 				+ "=?";
+
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
@@ -164,7 +170,10 @@ public class TrustEvaluationContactNode {
 		statement.bindLong(3, mergedContact.getIsFacebook());
 		statement.bindLong(4, mergedContact.getIsTwitter());
 		statement.bindLong(5, mergedContact.getIsLinkedin());
-		statement.bindString(6, mergedContact.getFacebookId());
+		if (mergedContact.getFacebookId() != null)
+			statement.bindString(6, mergedContact.getFacebookId());
+		else
+			statement.bindNull(6);
 		statement.bindString(7, mergedContact.getDisplayNameGlobal());
 		statement.execute();
 
@@ -173,6 +182,15 @@ public class TrustEvaluationContactNode {
 	}
 
 	public List<MergedContactNode> getMergedContacts(String sortOrder) {
+		String displayName;
+		int sourceScore;
+		int trustScore;
+		int isLocalPhone;
+		int isLocalEmail;
+		int isFacebook;
+		int isTwitter;
+		int isLinkedin;
+
 		if (readable == null) {
 			readable = mDbHelper.getReadableDatabase();
 		}
@@ -185,23 +203,40 @@ public class TrustEvaluationContactNode {
 			contacts = null;
 		} else {
 			while (c.moveToNext()) {
+				displayName = c
+						.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL));
+				sourceScore = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_SOURCE_SCORE));
+				trustScore = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE));
+				isLocalPhone = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE));
+				isLocalEmail = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL));
+				isFacebook = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK));
+				isTwitter = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER));
+				isLinkedin = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN));
+
 				MergedContactNode contact = new MergedContactNode();
-				contact.setDisplayNameGlobal(c.getString(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL)));
-				contact.setSourceScore(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_SOURCE_SCORE)));
-				contact.setTrustScore(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE)));
-				contact.setIsLocalPhone(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE)));
-				contact.setIsLocalEmail(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL)));
-				contact.setIsFacebook(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK)));
-				contact.setIsTwitter(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER)));
-				contact.setIsLinkedin(c.getInt(c
-						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN)));
+				contact.setDisplayNameGlobal(displayName);
+				contact.setSourceScore(sourceScore);
+				contact.setTrustScore(trustScore);
+				contact.setIsLocalPhone(isLocalPhone);
+				contact.setIsLocalEmail(isLocalEmail);
+				contact.setIsFacebook(isFacebook);
+				contact.setIsTwitter(isTwitter);
+				contact.setIsLinkedin(isLinkedin);
 				contact.setFacebookId(c.getString(c
 						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID)));
 				contacts.add(contact);
@@ -214,9 +249,12 @@ public class TrustEvaluationContactNode {
 	}
 
 	public void calculateSourceScore(MergedContactNode contact) {
-		Log.v(TAG, "calculating source score...");
-
 		int score = 0;
+		int isLocalPhone;
+		int isLocalEmail;
+		int isFacebook;
+		int isTwitter;
+		int isLinkedin;
 
 		if (readable == null) {
 			readable = mDbHelper.getReadableDatabase();
@@ -230,17 +268,24 @@ public class TrustEvaluationContactNode {
 				null, null, null);
 
 		while (c.moveToNext()) {
-			score = c
+			isLocalPhone = c
 					.getInt(c
-							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE))
-					+ c.getInt(c
-							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL))
-					+ c.getInt(c
-							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK))
-					+ c.getInt(c
-							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER))
-					+ c.getInt(c
+							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE));
+			isLocalEmail = c
+					.getInt(c
+							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL));
+			isFacebook = c
+					.getInt(c
+							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK));
+			isTwitter = c
+					.getInt(c
+							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER));
+			isLinkedin = c
+					.getInt(c
 							.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN));
+
+			score = isLocalPhone + isLocalEmail + isFacebook + isTwitter
+					+ isLinkedin;
 		}
 
 		c.close();
