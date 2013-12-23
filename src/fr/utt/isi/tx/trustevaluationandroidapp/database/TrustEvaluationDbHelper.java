@@ -1,5 +1,8 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.database;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -11,6 +14,7 @@ import org.brickred.socialauth.Contact;
 import com.facebook.model.GraphUser;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
+import fr.utt.isi.tx.trustevaluationandroidapp.utils.Config;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
@@ -27,7 +31,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 40;
+	public static final int DATABASE_VERSION = 60;
 
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
@@ -497,6 +501,9 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			while (c.moveToNext()) {
 				MergedContactNode contactNode = new MergedContactNode();
 				contactNode
+						.setId(c.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode._ID)));
+				contactNode
 						.setDisplayNameGlobal(c.getString(c
 								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL)));
 				contactNode
@@ -649,5 +656,44 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		writable.endTransaction();
 
 		c.close();
+	}
+
+	public void exportNodeContactTable(Context context) throws IOException {
+		StringBuilder mStringBuilder = new StringBuilder();
+		
+		// write the header
+		mStringBuilder.append("id,display_name_global,source_score,trust_score,is_local_phone,is_local_email,is_facebook,is_twitter,is_linkedin,facebook_id,\n");
+		
+		// get contact node list from db
+		List<MergedContactNode> contactNodes = getMergedContacts(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE + " DESC");
+		
+		for (int i = 0; i < contactNodes.size(); i++) {
+			MergedContactNode contactNode = contactNodes.get(i);
+			mStringBuilder.append(contactNode.getId());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getDisplayNameGlobal());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getSourceScore());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getTrustScore());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getIsLocalPhone());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getIsLocalEmail());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getIsFacebook());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getIsTwitter());
+			mStringBuilder.append(",");
+			mStringBuilder.append(contactNode.getIsLinkedin());
+			mStringBuilder.append(",");
+			//mStringBuilder.append("\"" + contactNode.getFacebookId() + "\"");
+			//mStringBuilder.append(",");
+			mStringBuilder.append("\n");
+		}
+		
+		FileOutputStream fos = context.openFileOutput(Config.EXPORT_FILE_NAME, Context.MODE_WORLD_READABLE);
+		fos.write(mStringBuilder.toString().getBytes());
+		fos.close();
 	}
 }
