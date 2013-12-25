@@ -4,7 +4,6 @@ import java.util.List;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -44,8 +43,6 @@ public class MatchingListFragment extends Fragment {
 
 		if (contactNodeHelper == null)
 			contactNodeHelper = new TrustEvaluationContactNode(getActivity());
-		
-		new VirtualContactNodeTableCopier().execute();
 	}
 
 	@Override
@@ -79,26 +76,6 @@ public class MatchingListFragment extends Fragment {
 		mergedList.setAdapter(adapter);
 
 		return view;
-	}
-
-	private class VirtualContactNodeTableCopier extends
-			AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... arg0) {
-			Log.v(TAG, "creating virtual table...");
-			if (contactNodeHelper == null)
-				contactNodeHelper = new TrustEvaluationContactNode(
-						getActivity());
-			
-			// drop the older virtual table
-			//contactNodeHelper.dropVirtualFTSTableForSearch();
-
-			// create the virtual table of contact node table
-			contactNodeHelper.createVirtualFTSTableForSearch();
-			return null;
-		}
-
 	}
 
 }

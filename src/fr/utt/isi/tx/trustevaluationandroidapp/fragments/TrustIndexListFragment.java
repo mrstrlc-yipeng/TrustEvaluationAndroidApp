@@ -10,6 +10,9 @@ import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.tasks.TweetTrustIndexTask;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -19,17 +22,24 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
-public class TrustIndexListFragment extends Fragment {
+public class TrustIndexListFragment extends Fragment implements
+		OnItemClickListener {
 
 	private static final String TAG = "TrustIndexListFragment";
+
+	private static final String[] ITEM_OPTIONS = { "send tweet" };
 
 	private String sortOrder = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE
 			+ " DESC";
 
 	private TrustEvaluationDbHelper mDbHelper = null;
+
+	private List<MergedContactNode> contactNodeList;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -56,8 +66,7 @@ public class TrustIndexListFragment extends Fragment {
 
 		// data list
 		Log.v(TAG, "getting contact node list from db...");
-		List<MergedContactNode> contactNodeList = mDbHelper
-				.getMergedContacts(sortOrder);
+		contactNodeList = mDbHelper.getMergedContacts(sortOrder);
 
 		// set up adapter to display the trust index score
 		ContactNodeListAdapter mAdapter = new ContactNodeListAdapter(
@@ -66,8 +75,54 @@ public class TrustIndexListFragment extends Fragment {
 
 		// assign the adapter to the list view
 		trustIndexListView.setAdapter(mAdapter);
+		trustIndexListView.setOnItemClickListener(this);
 
 		return view;
+	}
+
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		String contactName = contactNodeList.get(position)
+				.getDisplayNameGlobal();
+		int trustIndex = contactNodeList.get(position).getTrustScore();
+
+		// composite status
+		final String status = "The trust score between "
+				+ contactName
+				+ " and I is estimated to be "
+				+ trustIndex
+				+ " by #TrustEvaluationAndroidApp ! Try evaluate your contacts now! ";
+
+		AlertDialog.Builder optionsBuilder = new AlertDialog.Builder(
+				getActivity());
+		optionsBuilder.setTitle(R.string.app_name);
+		optionsBuilder.setItems(ITEM_OPTIONS,
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) {
+						AlertDialog.Builder builder = new AlertDialog.Builder(
+								getActivity());
+						builder.setTitle("Tweet status:");
+						builder.setMessage(status);
+						builder.setPositiveButton("Yes",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										new TweetTrustIndexTask(getActivity())
+												.execute(status);
+									}
+								});
+						builder.setNegativeButton("No",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+
+									}
+								});
+						builder.create().show();
+					}
+				});
+		optionsBuilder.create().show();
 	}
 
 	@Override
@@ -78,18 +133,18 @@ public class TrustIndexListFragment extends Fragment {
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle presses on the action bar items
-	    switch (item.getItemId()) {
-	        case R.id.action_export:
-	        	Log.v(TAG, "item selected export");
-	        	exportAndSend();
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
+		// Handle presses on the action bar items
+		switch (item.getItemId()) {
+		case R.id.action_export:
+			Log.v(TAG, "item selected export");
+			exportAndSend();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	public void exportAndSend() {
@@ -112,16 +167,19 @@ public class TrustIndexListFragment extends Fragment {
 				new String[] { Config.EMAIL_DESTINATION });
 		i.putExtra(Intent.EXTRA_SUBJECT, Config.EMAIL_SUJECT);
 		i.putExtra(Intent.EXTRA_TEXT, Config.EMAIL_BODY);
-		
+
 		// attach the file
 		Uri uri = Uri.fromFile(file);
 		Log.v(TAG, "file uri: " + uri.toString());
 		i.putExtra(android.content.Intent.EXTRA_STREAM, uri);
-		
+
 		try {
-		    startActivity(Intent.createChooser(i, "Send mail with exported database file..."));
+			startActivity(Intent.createChooser(i,
+					"Send mail with exported database file..."));
 		} catch (android.content.ActivityNotFoundException ex) {
-		    Toast.makeText(getActivity(), "There are no email clients installed.", Toast.LENGTH_SHORT).show();
+			Toast.makeText(getActivity(),
+					"There are no email clients installed.", Toast.LENGTH_SHORT)
+					.show();
 		}
 	}
 
