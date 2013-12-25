@@ -13,10 +13,10 @@ import org.brickred.socialauth.Contact;
 import com.facebook.model.GraphUser;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.Config;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
+import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.PseudoFacebookGraphUser;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -30,7 +30,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 61;
+	public static final int DATABASE_VERSION = 62;
 
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
@@ -67,6 +67,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 	public void dropDatabase(SQLiteDatabase db) {
 		db.execSQL(TrustEvaluationDataContract.ContactNode.SQL_DELETE_ENTRIES);
+		db.execSQL(TrustEvaluationDataContract.ContactNode.SQL_DELETE_VIRTUAL_FTS_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalPhoneContact.SQL_DELETE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalEmailContact.SQL_DELETE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.FacebookContact.SQL_DELETE_ENTRIES);

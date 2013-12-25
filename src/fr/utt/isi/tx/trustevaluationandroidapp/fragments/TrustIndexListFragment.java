@@ -6,10 +6,10 @@ import java.util.List;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.ContactNodeListAdapter;
+import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.Config;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;

@@ -1,5 +1,6 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.database;
 
+import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
 import android.provider.BaseColumns;
 
 public final class TrustEvaluationDataContract {
@@ -10,6 +11,7 @@ public final class TrustEvaluationDataContract {
 
 	public static abstract class ContactNode implements BaseColumns {
 		public static final String TABLE_NAME = "contact_node";
+		public static final String VIRTUAL_TABLE_NAME = "contact_node_virtual";
 		public static final String COLUMN_NAME_DISPLAY_NAME_GLOBAL = "display_name_global";
 		public static final String COLUMN_NAME_SOURCE_SCORE = "source_score";
 		public static final String COLUMN_NAME_TRUST_SCORE = "trust_score";
@@ -64,9 +66,55 @@ public final class TrustEvaluationDataContract {
 				//+ COMMA_SEP
 				//+ COLUMN_NAME_LINKEDIN_ID + " TEXT DEFAULT NULL"
 				+ ")";
+		
+		public static final String SQL_CREATE_VIRTUAL_FTS_ENTRIES = "CREATE VIRTUAL TABLE IF NOT EXISTS "
+				+ VIRTUAL_TABLE_NAME
+				+ " USING " + Config.FTS_VERSION
+				+ " ("
+				+ _ID
+				+ " INTEGER PRIMARY KEY"
+				+ COMMA_SEP
+				+ COLUMN_NAME_DISPLAY_NAME_GLOBAL
+				+ " TEXT"
+				+ COMMA_SEP
+				+ COLUMN_NAME_SOURCE_SCORE
+				+ " INTEGER DEFAULT 0"
+				+ COMMA_SEP
+				+ COLUMN_NAME_TRUST_SCORE
+				+ " INTEGER DEFAULT 0"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_LOCAL_PHONE
+				+ " TINYINT DEFAULT 0"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_LOCAL_EMAIL
+				+ " TINYINT DEFAULT 0"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_FACEBOOK
+				+ " TINYINT DEFAULT 0"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_TWITTER
+				+ " TINYINT DEFAULT 0"
+				+ COMMA_SEP
+				+ COLUMN_NAME_IS_LINKEDIN
+				+ " TINYINT DEFAULT 0"
+				//+ COMMA_SEP
+				//+ COLUMN_NAME_LOCAL_ID
+				//+ " INTEGER DEFAULT NULL"
+				+ COMMA_SEP
+				+ COLUMN_NAME_FACEBOOK_ID
+				+ " TEXT DEFAULT NULL"
+				//+ COMMA_SEP
+				//+ COLUMN_NAME_TWITTER_ID
+				//+ " TEXT DEFAULT NULL"
+				//+ COMMA_SEP
+				//+ COLUMN_NAME_LINKEDIN_ID + " TEXT DEFAULT NULL"
+				+ ")";
 
 		public static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS "
 				+ TABLE_NAME;
+		
+		public static final String SQL_DELETE_VIRTUAL_FTS_ENTRIES = "DROP TABLE IF EXISTS "
+				+ VIRTUAL_TABLE_NAME;
 	}
 
 	public static abstract class LocalPhoneContact implements BaseColumns {

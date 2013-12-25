@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.QuickContactBadge;
 import android.widget.TextView;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
 
 public class LocalContactListAdapter extends ArrayAdapter<LocalContact> {
 

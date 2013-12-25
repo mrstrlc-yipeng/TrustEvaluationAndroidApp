@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
 
 public class TrustEvaluationContactNode {
 	private static final String TAG = "TrustEvaluationContactNode";
@@ -29,6 +29,10 @@ public class TrustEvaluationContactNode {
 	}
 
 	public boolean isInsertedContactNode(String name) {
+		return isInsertedContactNode(tableName, name);
+	}
+	
+	public boolean isInsertedContactNode(String tableName, String name) {
 		if (readable == null) {
 			readable = mDbHelper.getReadableDatabase();
 		}
@@ -53,7 +57,7 @@ public class TrustEvaluationContactNode {
 		}
 		c.close();
 
-		Log.v(TAG, "insertedContactNode? " + isInserted);
+		//Log.v(TAG, "insertedContactNode? " + isInserted);
 		return isInserted;
 	}
 
@@ -98,7 +102,11 @@ public class TrustEvaluationContactNode {
 	}
 
 	public void insertContactNode(MergedContactNode contactNode) {
-		Log.v(TAG, "inserting contactNode..");
+		insertContactNode(tableName, contactNode);
+	}
+	
+	public void insertContactNode(String tableName, MergedContactNode contactNode) {
+		//Log.v(TAG, "inserting contactNode..");
 
 		if (writable == null) {
 			writable = mDbHelper.getWritableDatabase();
@@ -109,7 +117,7 @@ public class TrustEvaluationContactNode {
 		SQLiteStatement statement = writable.compileStatement(query);
 		writable.beginTransaction();
 
-		if (!isInsertedContactNode(contactNode.getDisplayNameGlobal())) {
+		if (!isInsertedContactNode(tableName, contactNode.getDisplayNameGlobal())) {
 			statement.clearBindings();
 			statement.bindString(2, contactNode.getDisplayNameGlobal());
 			statement.bindLong(3, contactNode.getSourceScore());
@@ -180,8 +188,33 @@ public class TrustEvaluationContactNode {
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
 	}
+	
+	public void createVirtualFTSTableForSearch() {
+		if (writable == null) {
+			writable = mDbHelper.getWritableDatabase();
+		}
+		
+		writable.execSQL(TrustEvaluationDataContract.ContactNode.SQL_CREATE_VIRTUAL_FTS_ENTRIES);
+		
+		List<MergedContactNode> contactNodeList = getMergedContacts(null);
+		for (int i = 0; i < contactNodeList.size(); i++) {
+			insertContactNode(TrustEvaluationDataContract.ContactNode.VIRTUAL_TABLE_NAME, contactNodeList.get(i));
+		}
+	}
+	
+	public void dropVirtualFTSTableForSearch() {
+		if (writable == null) {
+			writable = mDbHelper.getWritableDatabase();
+		}
+		
+		writable.execSQL(TrustEvaluationDataContract.ContactNode.SQL_DELETE_VIRTUAL_FTS_ENTRIES);
+	}
 
 	public List<MergedContactNode> getMergedContacts(String sortOrder) {
+		return getMergedContacts(tableName, null, null, sortOrder);
+	}
+	
+	public List<MergedContactNode> getMergedContacts(String tableName, String selection, String[] selectionArgs, String sortOrder) {
 		String displayName;
 		int sourceScore;
 		int trustScore;
@@ -197,7 +230,7 @@ public class TrustEvaluationContactNode {
 
 		List<MergedContactNode> contacts = new ArrayList<MergedContactNode>();
 
-		Cursor c = readable.query(tableName, null, null, null, null, null,
+		Cursor c = readable.query(tableName, null, selection, selectionArgs, null, null,
 				sortOrder);
 		if (c.getCount() == 0) {
 			contacts = null;

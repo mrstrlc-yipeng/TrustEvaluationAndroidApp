@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.PseudoFacebookGraphUser;
 
 public class PseudoFacebookGraphUserListAdapter extends
 		ArrayAdapter<PseudoFacebookGraphUser> {

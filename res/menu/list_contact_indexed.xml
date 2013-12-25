@@ -1,14 +1,15 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:trustevaluationandroidapp="http://schemas.android.com/apk/res-auto" >
     
     <item android:id="@+id/action_export"
         android:icon="@drawable/ic_action_import_export"
         android:title="@string/action_export"
-        android:showAsAction="ifRoom" />
+        trustevaluationandroidapp:showAsAction="ifRoom" />
 
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
-        android:showAsAction="never"
+        trustevaluationandroidapp:showAsAction="never"
         android:title="@string/action_settings"/>
 
 </menu>

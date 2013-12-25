@@ -1161,7 +1161,7 @@ containing a value of this type.
         public static final int com_facebook_list_section_header_background=0x7f020069;
         public static final int com_facebook_loginbutton_silver=0x7f02006a;
         public static final int com_facebook_logo=0x7f02006b;
-        public static final int com_facebook_picker_default_separator_color=0x7f02008f;
+        public static final int com_facebook_picker_default_separator_color=0x7f020090;
         public static final int com_facebook_picker_item_background=0x7f02006c;
         public static final int com_facebook_picker_list_focused=0x7f02006d;
         public static final int com_facebook_picker_list_longpressed=0x7f02006e;
@@ -1185,18 +1185,19 @@ containing a value of this type.
         public static final int google=0x7f020080;
         public static final int googleplus=0x7f020081;
         public static final int ic_action_import_export=0x7f020082;
-        public static final int ic_contact_picture_holo_light=0x7f020083;
-        public static final int ic_launcher=0x7f020084;
-        public static final int icon=0x7f020085;
-        public static final int instagram=0x7f020086;
-        public static final int linkedin=0x7f020087;
-        public static final int mms=0x7f020088;
-        public static final int myspace=0x7f020089;
-        public static final int runkeeper=0x7f02008a;
-        public static final int salesforce=0x7f02008b;
-        public static final int twitter=0x7f02008c;
-        public static final int yahoo=0x7f02008d;
-        public static final int yammer=0x7f02008e;
+        public static final int ic_action_search=0x7f020083;
+        public static final int ic_contact_picture_holo_light=0x7f020084;
+        public static final int ic_launcher=0x7f020085;
+        public static final int icon=0x7f020086;
+        public static final int instagram=0x7f020087;
+        public static final int linkedin=0x7f020088;
+        public static final int mms=0x7f020089;
+        public static final int myspace=0x7f02008a;
+        public static final int runkeeper=0x7f02008b;
+        public static final int salesforce=0x7f02008c;
+        public static final int twitter=0x7f02008d;
+        public static final int yahoo=0x7f02008e;
+        public static final int yammer=0x7f02008f;
     }
     public static final class id {
         public static final int action_bar=0x7f06001e;
@@ -1211,6 +1212,7 @@ containing a value of this type.
         public static final int action_menu_divider=0x7f060018;
         public static final int action_menu_presenter=0x7f060019;
         public static final int action_mode_close_button=0x7f060026;
+        public static final int action_search=0x7f06006c;
         public static final int action_settings=0x7f06006b;
         public static final int activity_chooser_view_content=0x7f060027;
         public static final int always=0x7f06000d;
@@ -1391,8 +1393,9 @@ containing a value of this type.
     }
     public static final class menu {
         public static final int list_contact_indexed=0x7f0d0000;
-        public static final int list_contact_splitted=0x7f0d0001;
-        public static final int main=0x7f0d0002;
+        public static final int list_contact_merged=0x7f0d0001;
+        public static final int list_contact_splitted=0x7f0d0002;
+        public static final int main=0x7f0d0003;
     }
     public static final class string {
         /**  Content description for the action bar "home" affordance. [CHAR LIMIT=NONE] 
@@ -1435,14 +1438,20 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abc_shareactionprovider_share_with_application=0x7f090024;
-        public static final int action_export=0x7f090037;
-        public static final int action_settings=0x7f090027;
-        public static final int app_id=0x7f09002b;
+        public static final int action_export=0x7f090038;
+        /**  action bar 
+         */
+        public static final int action_search=0x7f090035;
+        public static final int action_settings=0x7f090036;
+        /**  contact list fragments 
+         */
+        public static final int app_id=0x7f09002f;
+        /**  app basic 
+         */
         public static final int app_name=0x7f090026;
-        public static final int button_contacts=0x7f09002a;
-        public static final int button_list_1=0x7f09002e;
-        public static final int button_list_2=0x7f09002f;
-        public static final int button_list_3=0x7f090030;
+        public static final int button_list_1=0x7f090028;
+        public static final int button_list_2=0x7f090029;
+        public static final int button_list_3=0x7f09002a;
         public static final int button_update=0x7f090033;
         public static final int com_facebook_choose_friends=0x7f09000f;
         public static final int com_facebook_dialogloginactivity_ok_button=0x7f090000;
@@ -1469,14 +1478,19 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_log_in_button=0x7f090008;
         public static final int com_facebook_usersettingsfragment_logged_in=0x7f090009;
         public static final int com_facebook_usersettingsfragment_not_logged_in=0x7f09000a;
-        public static final int development_env=0x7f090029;
-        public static final int get_started=0x7f09002c;
-        public static final int hello_world=0x7f090036;
+        public static final int development_env=0x7f090027;
+        public static final int get_started=0x7f090030;
+        public static final int label_indexed=0x7f09002e;
+        public static final int label_main=0x7f09002b;
+        public static final int label_merged=0x7f09002d;
+        public static final int label_splitted=0x7f09002c;
         public static final int linkedin_login_button_text=0x7f090032;
         public static final int logout=0x7f090034;
-        public static final int settings=0x7f09002d;
-        public static final int title_activity_list_contact_indexed=0x7f090035;
-        public static final int title_activity_list_contact_splitted=0x7f090028;
+        /**  search 
+         */
+        public static final int search_hint=0x7f090039;
+        public static final int settings=0x7f090037;
+        public static final int title_activity_searchable=0x7f09003a;
         public static final int twitter_login_button_text=0x7f090031;
     }
     public static final class style {
@@ -1687,6 +1701,7 @@ containing a value of this type.
     }
     public static final class xml {
         public static final int filepaths=0x7f050000;
+        public static final int searchable=0x7f050001;
     }
     public static final class styleable {
         /**  ============================================ 
