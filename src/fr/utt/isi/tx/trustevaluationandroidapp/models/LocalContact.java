@@ -1,4 +1,4 @@
-package fr.utt.isi.tx.trustevaluationandroidapp.utils;
+package fr.utt.isi.tx.trustevaluationandroidapp.models;
 
 import org.brickred.socialauth.Contact;
 

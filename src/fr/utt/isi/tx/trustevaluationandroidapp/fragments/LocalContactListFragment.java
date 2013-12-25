@@ -8,8 +8,8 @@ import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedAct
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.LocalContactListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
 import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.app.Activity;

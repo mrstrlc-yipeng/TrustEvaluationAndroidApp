@@ -10,7 +10,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
 
 public class ContactNodeListAdapter extends ArrayAdapter<MergedContactNode> {
 

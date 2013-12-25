@@ -13,10 +13,10 @@ import org.brickred.socialauth.Contact;
 import com.facebook.model.GraphUser;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.Config;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
+import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.PseudoFacebookGraphUser;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

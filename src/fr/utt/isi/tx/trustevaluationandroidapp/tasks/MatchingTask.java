@@ -9,9 +9,9 @@ import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedAct
 import fr.utt.isi.tx.trustevaluationandroidapp.computingalgo.MatchingAlgo;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationContactNode;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.PseudoFacebookGraphUser;
 import android.content.Context;
 import android.os.AsyncTask;
 

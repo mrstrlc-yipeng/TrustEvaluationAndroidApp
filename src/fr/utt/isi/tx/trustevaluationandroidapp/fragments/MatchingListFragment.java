@@ -12,7 +12,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.ContactNodeListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationContactNode;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
 
 public class MatchingListFragment extends Fragment {
 

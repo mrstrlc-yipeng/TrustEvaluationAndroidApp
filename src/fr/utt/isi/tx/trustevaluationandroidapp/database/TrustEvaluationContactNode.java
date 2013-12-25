@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.util.Log;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
 
 public class TrustEvaluationContactNode {
 	private static final String TAG = "TrustEvaluationContactNode";

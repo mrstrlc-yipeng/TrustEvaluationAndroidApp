@@ -30,10 +30,11 @@ import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.GraphUserListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.PseudoFacebookGraphUserListAdapter;
+import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.PseudoFacebookGraphUser;
 import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.content.Context;
@@ -65,8 +66,6 @@ public class FacebookFriendListFragment extends Fragment implements
 
 	// shared preferences for storing my user id
 	private static SharedPreferences mSharedPreferences;
-	private static final String PREF_NAME = "facebook_fragment_preferences";
-	private static final String PREF_USER_ID = "user_id";
 
 	// user id
 	private String userId = null;
@@ -100,11 +99,11 @@ public class FacebookFriendListFragment extends Fragment implements
 		super.onCreate(savedInstanceState);
 
 		// get shared preferences
-		mSharedPreferences = getActivity().getSharedPreferences(PREF_NAME,
+		mSharedPreferences = getActivity().getSharedPreferences(Config.PREF_NAME_FACEBOOK,
 				Context.MODE_PRIVATE);
 
 		// get user id from shared preferences
-		userId = mSharedPreferences.getString(PREF_USER_ID, null);
+		userId = mSharedPreferences.getString(Config.PREF_USER_ID_FACEBOOK, null);
 
 		// create ui lifecycle helper instance
 		uiHelper = new UiLifecycleHelper(getActivity(), callback);
@@ -259,7 +258,7 @@ public class FacebookFriendListFragment extends Fragment implements
 								// store the user id
 								userId = user.getId();
 								Editor e = mSharedPreferences.edit();
-								e.putString(PREF_USER_ID, userId);
+								e.putString(Config.PREF_USER_ID_FACEBOOK, userId);
 								e.commit();
 							}
 						}

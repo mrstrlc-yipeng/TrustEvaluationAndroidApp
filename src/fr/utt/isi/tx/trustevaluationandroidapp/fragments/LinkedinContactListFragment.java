@@ -12,6 +12,7 @@ import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.SocialAuthContactListAdapter;
+import fr.utt.isi.tx.trustevaluationandroidapp.config.Config;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
@@ -43,8 +44,6 @@ public class LinkedinContactListFragment extends Fragment implements
 
 	// shared preferences
 	private static SharedPreferences mSharedPreferences;
-	private static final String PREF_NAME = "linkedin_fragment_preferences";
-	private static final String PREF_IS_FIRST_VISIT = "is_first_visit";
 
 	// is first visit
 	private boolean isFirstVisit = true;
@@ -72,11 +71,11 @@ public class LinkedinContactListFragment extends Fragment implements
 		Log.v(TAG, "Creating fragment...");
 
 		// get shared preferences
-		mSharedPreferences = getActivity().getSharedPreferences(PREF_NAME,
+		mSharedPreferences = getActivity().getSharedPreferences(Config.PREF_NAME_LINKEDIN,
 				Context.MODE_PRIVATE);
 
 		// get boolean "is_first_visit" from shared preferences
-		isFirstVisit = mSharedPreferences.getBoolean(PREF_IS_FIRST_VISIT, true);
+		isFirstVisit = mSharedPreferences.getBoolean(Config.PREF_IS_FIRST_VISIT_LINKEDIN, true);
 
 		adapter = new SocialAuthAdapter(new ResponseListener());
 
@@ -216,7 +215,7 @@ public class LinkedinContactListFragment extends Fragment implements
 		// set "is_first_visit" to true
 		isFirstVisit = true;
 		Editor e = mSharedPreferences.edit();
-		e.putBoolean(PREF_IS_FIRST_VISIT, isFirstVisit);
+		e.putBoolean(Config.PREF_IS_FIRST_VISIT_LINKEDIN, isFirstVisit);
 		e.commit();
 
 		toggleView();
@@ -239,7 +238,7 @@ public class LinkedinContactListFragment extends Fragment implements
 				// set "is_first_visit" to false
 				isFirstVisit = false;
 				Editor e = mSharedPreferences.edit();
-				e.putBoolean(PREF_IS_FIRST_VISIT, isFirstVisit);
+				e.putBoolean(Config.PREF_IS_FIRST_VISIT_LINKEDIN, isFirstVisit);
 				e.commit();
 
 				toggleView();
