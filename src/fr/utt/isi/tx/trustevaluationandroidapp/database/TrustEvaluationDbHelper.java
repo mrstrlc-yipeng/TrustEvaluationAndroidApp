@@ -30,7 +30,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 61;
+	public static final int DATABASE_VERSION = 62;
 
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 
@@ -67,6 +67,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 	public void dropDatabase(SQLiteDatabase db) {
 		db.execSQL(TrustEvaluationDataContract.ContactNode.SQL_DELETE_ENTRIES);
+		db.execSQL(TrustEvaluationDataContract.ContactNode.SQL_DELETE_VIRTUAL_FTS_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalPhoneContact.SQL_DELETE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.LocalEmailContact.SQL_DELETE_ENTRIES);
 		db.execSQL(TrustEvaluationDataContract.FacebookContact.SQL_DELETE_ENTRIES);

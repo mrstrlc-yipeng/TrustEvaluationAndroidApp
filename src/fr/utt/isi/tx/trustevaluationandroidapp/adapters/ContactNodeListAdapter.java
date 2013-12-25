@@ -1,5 +1,6 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.adapters;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
@@ -27,7 +28,7 @@ public class ContactNodeListAdapter extends ArrayAdapter<MergedContactNode> {
 		super(context, textViewResourceId, contactNodes);
 
 		this.context = context;
-		this.contactNodes = contactNodes;
+		this.contactNodes = contactNodes == null ? new ArrayList<MergedContactNode>() : contactNodes;
 	}
 
 	@Override

@@ -2,6 +2,9 @@ package fr.utt.isi.tx.trustevaluationandroidapp.config;
 
 public class Config {
 	
+	// database
+	public static final String FTS_VERSION = "fts3";
+	
 	// shared preferences
 	public static final String PREF_NAME_FACEBOOK = "facebook_fragment_preferences";
 	public static final String PREF_USER_ID_FACEBOOK = "user_id_facebook";
