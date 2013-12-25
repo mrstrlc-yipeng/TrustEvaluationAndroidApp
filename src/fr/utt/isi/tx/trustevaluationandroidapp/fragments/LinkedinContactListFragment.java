@@ -14,6 +14,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedAct
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.SocialAuthContactListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -288,6 +289,9 @@ public class LinkedinContactListFragment extends Fragment implements
 						contactsList);
 				mAdapter.setProvider(Provider.LINKEDIN);
 				friendList.setAdapter(mAdapter);
+				
+				// do matching in background
+				new MatchingTask(getActivity()).execute(ListContactSplittedActivity.LINKEDIN);
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}

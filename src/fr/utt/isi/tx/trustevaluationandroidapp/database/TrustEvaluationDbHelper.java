@@ -1,6 +1,5 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.database;
 
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,7 +30,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 60;
+	public static final int DATABASE_VERSION = 61;
 
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 

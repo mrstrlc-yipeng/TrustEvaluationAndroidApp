@@ -14,7 +14,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.utils.MergedContactNode;
 
 public class ContactNodeListAdapter extends ArrayAdapter<MergedContactNode> {
 
-	private static final String TAG = "ContactNodeListAdapter";
+	//private static final String TAG = "ContactNodeListAdapter";
 
 	private Context context;
 

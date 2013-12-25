@@ -10,11 +10,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
-
 public class Utils {
 	
-	private static final String TAG = "Utils";
+	//private static final String TAG = "Utils";
 	
 	public static String cleanDisplayName(String displayName) {
 		// clean display_name if its format is email

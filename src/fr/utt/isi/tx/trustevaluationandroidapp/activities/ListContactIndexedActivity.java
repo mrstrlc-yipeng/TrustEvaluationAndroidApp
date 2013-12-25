@@ -2,12 +2,10 @@ package fr.utt.isi.tx.trustevaluationandroidapp.activities;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.MainActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
-import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
-import android.view.MenuItem;
 
 public class ListContactIndexedActivity extends ActionBarActivity {
 
@@ -19,9 +17,6 @@ public class ListContactIndexedActivity extends ActionBarActivity {
 		// get action bar by support library
 		ActionBar actionBar = getSupportActionBar();
 		actionBar.setDisplayShowHomeEnabled(true);
-		
-		TrustEvaluationDbHelper mDbHelper = new TrustEvaluationDbHelper(this);
-		mDbHelper.calculateTrustIndex();
 		
 		MainActivity.mProgressDialog.dismiss();
 	}

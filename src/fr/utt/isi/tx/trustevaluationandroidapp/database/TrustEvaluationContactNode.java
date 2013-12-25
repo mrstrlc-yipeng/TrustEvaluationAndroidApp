@@ -289,6 +289,10 @@ public class TrustEvaluationContactNode {
 		}
 
 		c.close();
+		
+		if (writable == null) {
+			writable = mDbHelper.getWritableDatabase();
+		}
 
 		String query = "UPDATE "
 				+ tableName
