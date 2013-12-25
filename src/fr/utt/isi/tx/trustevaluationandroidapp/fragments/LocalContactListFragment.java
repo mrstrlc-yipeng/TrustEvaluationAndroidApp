@@ -8,6 +8,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedAct
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.LocalContactListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.LocalContact;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
@@ -271,6 +272,9 @@ public abstract class LocalContactListFragment extends Fragment implements
 
 			// dismiss the progress dialog
 			ListContactSplittedActivity.mProgressDialog.dismiss();
+			
+			// do matching in background
+			new MatchingTask(getActivity()).execute(getContactType());
 		}
 	}
 

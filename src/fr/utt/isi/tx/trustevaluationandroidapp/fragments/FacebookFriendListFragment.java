@@ -32,6 +32,7 @@ import fr.utt.isi.tx.trustevaluationandroidapp.adapters.GraphUserListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.PseudoFacebookGraphUserListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
+import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.PseudoFacebookGraphUser;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
@@ -356,7 +357,7 @@ public class FacebookFriendListFragment extends Fragment implements
 	private class FacebookCommonFriendsLoader extends
 			AsyncTask<List<GraphUser>, Void, Map<String, String>> {
 
-		private static final String TAG = "FacebookCommonFriendsLoader";
+		//private static final String TAG = "FacebookCommonFriendsLoader";
 
 		@Override
 		protected Map<String, String> doInBackground(List<GraphUser>... users) {
@@ -432,6 +433,9 @@ public class FacebookFriendListFragment extends Fragment implements
 			}
 			mDbHelper.updateCommonFriendList(results,
 					ListContactSplittedActivity.FACEBOOK);
+			
+			// do matching in background
+			new MatchingTask(getActivity()).execute(ListContactSplittedActivity.FACEBOOK);
 		}
 
 	}

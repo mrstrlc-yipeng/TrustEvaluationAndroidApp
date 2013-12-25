@@ -1,11 +1,11 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.fragments;
 
-import java.util.HashMap;
-import java.util.Iterator;
+//import java.util.HashMap;
+//import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
+//import java.util.Map;
+//import java.util.Timer;
+//import java.util.TimerTask;
 
 import org.brickred.socialauth.Contact;
 import org.brickred.socialauth.android.DialogListener;
@@ -13,19 +13,20 @@ import org.brickred.socialauth.android.SocialAuthAdapter;
 import org.brickred.socialauth.android.SocialAuthError;
 import org.brickred.socialauth.android.SocialAuthListener;
 import org.brickred.socialauth.android.SocialAuthAdapter.Provider;
-import org.brickred.socialauth.util.Response;
+//import org.brickred.socialauth.util.Response;
 
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactSplittedActivity;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.SocialAuthContactListAdapter;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
-import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
+import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
+//import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
-import android.os.AsyncTask;
+//import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -52,7 +53,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	private static SharedPreferences mSharedPreferences;
 	private static final String PREF_NAME = "twitter_fragment_preferences";
 	private static final String PREF_IS_FIRST_VISIT = "is_first_visit";
-	private static final String PREF_FRIEND_LIST_JSON = "friend_list_json";
+	//private static final String PREF_FRIEND_LIST_JSON = "friend_list_json";
 
 	// is first visit
 	private boolean isFirstVisit = true;
@@ -77,7 +78,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	// millisecond, for example, a bucket that limit 15 requests in 15 minutes
 	// means the average rate limit is 1 request per minute, this rate limit
 	// equals 60000 millisecond between 2 requests)
-	private static final long API_RATE_LIMIT = 60000;
+	//private static final long API_RATE_LIMIT = 60000;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -288,7 +289,6 @@ public class TwitterFriendListFragment2 extends Fragment implements
 	private final class ContactDataListener implements
 			SocialAuthListener<List<Contact>> {
 
-		@SuppressWarnings("unchecked")
 		@Override
 		public void onExecute(String provider, List<Contact> t) {
 			List<Contact> contactsList = t;
@@ -302,6 +302,9 @@ public class TwitterFriendListFragment2 extends Fragment implements
 						getActivity(), R.layout.twitter_friend_list,
 						contactsList);
 				friendList.setAdapter(mAdapter);
+				
+				// do matching in background
+				new MatchingTask(getActivity()).execute(ListContactSplittedActivity.TWITTER);
 			} else {
 				Log.d(TAG, "Contact List Empty");
 			}
@@ -318,7 +321,7 @@ public class TwitterFriendListFragment2 extends Fragment implements
 
 		}
 	}
-
+/*
 	private class TwitterCommonFriendsLoader extends
 			AsyncTask<List<Contact>, Void, Map<String, String>> {
 
@@ -423,5 +426,5 @@ public class TwitterFriendListFragment2 extends Fragment implements
 					ListContactSplittedActivity.TWITTER);
 		}
 	}
-
+*/
 }
