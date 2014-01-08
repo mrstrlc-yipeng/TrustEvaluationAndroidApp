@@ -62,7 +62,8 @@
         <activity
             android:name="fr.utt.isi.tx.trustevaluationandroidapp.activities.ListContactMergedActivity"
             android:label="@string/label_merged"
-            android:parentActivityName="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" >
+            android:parentActivityName="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity"
+            android:configChanges="orientation|screenSize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="fr.utt.isi.tx.trustevaluationandroidapp.MainActivity" />
