@@ -36,7 +36,7 @@ public class MatchingAlgo {
 				}				
 			}
 			
-			if (maxScore >= 0.8) {
+			if (maxScore >= 0.9) {
 				match++;
 			}			
 		}
