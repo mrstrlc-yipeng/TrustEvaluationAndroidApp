@@ -30,7 +30,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	private static final String TAG = "TrustEvaluationDbHelper";
 
 	// increase database version when database schema changes
-	public static final int DATABASE_VERSION = 62;
+	public static final int DATABASE_VERSION = 66;
 
 	public static final String DATABASE_NAME = "TrustEvaluation.db";
 

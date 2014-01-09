@@ -4,7 +4,7 @@ import java.util.List;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.os.AsyncTask;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -44,8 +44,6 @@ public class MatchingListFragment extends Fragment {
 
 		if (contactNodeHelper == null)
 			contactNodeHelper = new TrustEvaluationContactNode(getActivity());
-		
-		new VirtualContactNodeTableCopier().execute();
 	}
 
 	@Override
@@ -61,44 +59,49 @@ public class MatchingListFragment extends Fragment {
 
 		mergedList = (ListView) view.findViewById(R.id.matching_list);
 
-		List<MergedContactNode> contacts;
-		if (searchQuery != null && searchQuery != "") {
-			// execute the search by "match" mechanism of FTS
-			String tableName = TrustEvaluationDataContract.ContactNode.VIRTUAL_TABLE_NAME;
-			String selection = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL
-					+ " MATCH ?";
-			String[] selectionArgs = new String[] { searchQuery };
-			contacts = contactNodeHelper.getMergedContacts(tableName,
-					selection, selectionArgs, sortOrder);
-		} else {
-			contacts = contactNodeHelper.getMergedContacts(sortOrder);
-		}
-		adapter = new ContactNodeListAdapter(getActivity(), R.id.matching_list,
-				contacts);
+		adapter = new ContactNodeListAdapter(getActivity(),
+				R.layout.contact_node_list, getContactNodes());
 
 		mergedList.setAdapter(adapter);
 
 		return view;
 	}
 
-	private class VirtualContactNodeTableCopier extends
-			AsyncTask<Void, Void, Void> {
+	@Override
+	public void onConfigurationChanged(Configuration newConfig) {
+		super.onConfigurationChanged(newConfig);
+		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			// change the list to complete layout with icon of platforms
+			adapter = new ContactNodeListAdapter(getActivity(),
+					R.layout.contact_node_complete_list, getContactNodes());
+			mergedList.setAdapter(adapter);
+			mergedList.invalidateViews();
+		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			// change back the list to simple layout
+			adapter = new ContactNodeListAdapter(getActivity(),
+					R.layout.contact_node_list, getContactNodes());
+			mergedList.setAdapter(adapter);
+			mergedList.invalidateViews();
+		} else {
+			Log.v(TAG, "others");
+		}
+	}
 
-		@Override
-		protected Void doInBackground(Void... arg0) {
-			Log.v(TAG, "creating virtual table...");
-			if (contactNodeHelper == null)
-				contactNodeHelper = new TrustEvaluationContactNode(
-						getActivity());
-			
-			// drop the older virtual table
-			//contactNodeHelper.dropVirtualFTSTableForSearch();
-
-			// create the virtual table of contact node table
-			contactNodeHelper.createVirtualFTSTableForSearch();
-			return null;
+	private List<MergedContactNode> getContactNodes() {
+		List<MergedContactNode> contactNodes;
+		if (searchQuery != null && searchQuery != "") {
+			// execute the search by "match" mechanism of FTS
+			String tableName = TrustEvaluationDataContract.ContactNode.VIRTUAL_TABLE_NAME;
+			String selection = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL
+					+ " MATCH ?";
+			String[] selectionArgs = new String[] { searchQuery };
+			contactNodes = contactNodeHelper.getMergedContacts(tableName,
+					selection, selectionArgs, sortOrder);
+		} else {
+			contactNodes = contactNodeHelper.getMergedContacts(sortOrder);
 		}
 
+		return contactNodes;
 	}
 
 }
