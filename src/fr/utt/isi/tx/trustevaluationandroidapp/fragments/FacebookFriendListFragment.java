@@ -2,6 +2,7 @@ package fr.utt.isi.tx.trustevaluationandroidapp.fragments;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -99,11 +100,12 @@ public class FacebookFriendListFragment extends Fragment implements
 		super.onCreate(savedInstanceState);
 
 		// get shared preferences
-		mSharedPreferences = getActivity().getSharedPreferences(Config.PREF_NAME_FACEBOOK,
-				Context.MODE_PRIVATE);
+		mSharedPreferences = getActivity().getSharedPreferences(
+				Config.PREF_NAME_FACEBOOK, Context.MODE_PRIVATE);
 
 		// get user id from shared preferences
-		userId = mSharedPreferences.getString(Config.PREF_USER_ID_FACEBOOK, null);
+		userId = mSharedPreferences.getString(Config.PREF_USER_ID_FACEBOOK,
+				null);
 
 		// create ui lifecycle helper instance
 		uiHelper = new UiLifecycleHelper(getActivity(), callback);
@@ -187,6 +189,7 @@ public class FacebookFriendListFragment extends Fragment implements
 		proceedBySession(session, false);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void proceedBySession(Session session, boolean isForUpdate) {
 		if (session != null && session.isOpened()) {
 			// Hide login button
@@ -210,8 +213,16 @@ public class FacebookFriendListFragment extends Fragment implements
 
 			// try getting friend list from database
 			if (!isForUpdate) {
-				List<PseudoFacebookGraphUser> contacts = mDbHelper
-						.getFacebookContacts(null);
+				List<PseudoFacebookGraphUser> contacts;
+				if (ListContactSplittedActivity.contactLists
+						.get(ListContactSplittedActivity.FACEBOOK) != null) {
+					contacts = ListContactSplittedActivity.contactLists
+							.get(ListContactSplittedActivity.FACEBOOK);
+				} else {
+					contacts = mDbHelper.getFacebookContacts(null);
+					ListContactSplittedActivity.contactLists.set(ListContactSplittedActivity.FACEBOOK, (ArrayList) contacts);
+				}
+
 				if (contacts != null) {
 					PseudoFacebookGraphUserListAdapter mPseudoFacebookGraphUserListAdapter = new PseudoFacebookGraphUserListAdapter(
 							getActivity(), R.layout.facebook_friend_list,
@@ -258,7 +269,8 @@ public class FacebookFriendListFragment extends Fragment implements
 								// store the user id
 								userId = user.getId();
 								Editor e = mSharedPreferences.edit();
-								e.putString(Config.PREF_USER_ID_FACEBOOK, userId);
+								e.putString(Config.PREF_USER_ID_FACEBOOK,
+										userId);
 								e.commit();
 							}
 						}
@@ -300,6 +312,9 @@ public class FacebookFriendListFragment extends Fragment implements
 							ListContactSplittedActivity.mProgressDialog
 									.dismiss();
 
+							// do matching in background
+							new MatchingTask(getActivity())
+									.execute(ListContactSplittedActivity.FACEBOOK);
 							new FacebookCommonFriendsLoader().execute(users);
 						}
 						if (response.getError() != null) {
@@ -356,7 +371,7 @@ public class FacebookFriendListFragment extends Fragment implements
 	private class FacebookCommonFriendsLoader extends
 			AsyncTask<List<GraphUser>, Void, Map<String, String>> {
 
-		//private static final String TAG = "FacebookCommonFriendsLoader";
+		// private static final String TAG = "FacebookCommonFriendsLoader";
 
 		@Override
 		protected Map<String, String> doInBackground(List<GraphUser>... users) {
@@ -402,7 +417,7 @@ public class FacebookFriendListFragment extends Fragment implements
 							result += ";";
 						}
 					}
-					//Log.v(TAG, "result string: " + result);
+					// Log.v(TAG, "result string: " + result);
 
 					commonFriendLists.put(id, result);
 
@@ -432,9 +447,6 @@ public class FacebookFriendListFragment extends Fragment implements
 			}
 			mDbHelper.updateCommonFriendList(results,
 					ListContactSplittedActivity.FACEBOOK);
-			
-			// do matching in background
-			new MatchingTask(getActivity()).execute(ListContactSplittedActivity.FACEBOOK);
 		}
 
 	}

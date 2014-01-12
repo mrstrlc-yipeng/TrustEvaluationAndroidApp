@@ -19,6 +19,7 @@
     <string name="linkedin_login_button_text">Log in with LinkedIn</string>
     <string name="button_update">Update</string>
     <string name="logout">Log out</string>
+    <string name="button_refresh">Refresh</string>
 
     <!-- action bar -->
     <string name="action_search">Search</string>

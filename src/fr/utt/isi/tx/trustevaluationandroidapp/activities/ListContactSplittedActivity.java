@@ -1,5 +1,8 @@
 package fr.utt.isi.tx.trustevaluationandroidapp.activities;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
@@ -11,13 +14,14 @@ import fr.utt.isi.tx.trustevaluationandroidapp.fragments.LinkedinContactListFrag
 import fr.utt.isi.tx.trustevaluationandroidapp.fragments.LocalEmailListFragment;
 import fr.utt.isi.tx.trustevaluationandroidapp.fragments.LocalPhoneListFragment;
 import fr.utt.isi.tx.trustevaluationandroidapp.fragments.TwitterFriendListFragment2;
+import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -41,10 +45,16 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 	public static final int FACEBOOK = 2;
 	public static final int TWITTER = 3;
 	public static final int LINKEDIN = 4;
+	public static final int CONTACT_TYPE_COUNT = LINKEDIN + 1;
+	
+	public static List<LocalContact> localPhoneList = null;
+	
+	@SuppressWarnings("rawtypes")
+	public static List<ArrayList> contactLists = new ArrayList<ArrayList>(CONTACT_TYPE_COUNT);
 
 	// contact type
 	public static int contactType = LOCAL_PHONE;
-
+	
 	// fragment array index
 	private static final int LOCAL_PHONE_LIST_FRAGMENT = 0;
 	private static final int LOCAL_EMAIL_LIST_FRAGMENT = 1;
@@ -57,7 +67,7 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 	private static final int FRAGMENT_COUNT = FACEBOOK_USER_SETTINGS_FRAGMENT + 1;
 
 	// fragment array
-	// private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
+	private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
 
 	// pager adapter
 	private ContactFragmentPagerAdapter mPagerAdapter;
@@ -139,6 +149,10 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 		actionBar.addTab(actionBar.newTab().setText("LinkedIn")
 				.setTag(LINKEDIN).setTabListener(this));
 		
+		for (int i = 0; i < CONTACT_TYPE_COUNT; i++) {
+			contactLists.add(null);
+		}
+		
 		MainActivity.mProgressDialog.dismiss();
 	}
 
@@ -188,8 +202,8 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 		Session.getActiveSession().onActivityResult(this, requestCode,
 				resultCode, data);
 	}
-
-	private class ContactFragmentPagerAdapter extends FragmentStatePagerAdapter {
+	
+	private class ContactFragmentPagerAdapter extends FragmentPagerAdapter {
 
 		public ContactFragmentPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -198,19 +212,45 @@ public class ListContactSplittedActivity extends ActionBarActivity implements
 		@Override
 		public Fragment getItem(int fragmentIndex) {
 			Log.v("PagerAdapter", "fragment index: " + fragmentIndex);
+			Fragment f;
 			switch (fragmentIndex) {
 			default:
 				return null;
 			case LOCAL_PHONE_LIST_FRAGMENT:
-				return new LocalPhoneListFragment();
+				if (fragments[LOCAL_PHONE_LIST_FRAGMENT] != null) {
+					return fragments[LOCAL_PHONE_LIST_FRAGMENT];
+				}
+				f = new LocalPhoneListFragment();
+				fragments[LOCAL_PHONE_LIST_FRAGMENT] = f;
+				return f;
 			case LOCAL_EMAIL_LIST_FRAGMENT:
-				return new LocalEmailListFragment();
+				if (fragments[LOCAL_EMAIL_LIST_FRAGMENT] != null) {
+					return fragments[LOCAL_EMAIL_LIST_FRAGMENT];
+				}
+				f = new LocalEmailListFragment();
+				fragments[LOCAL_EMAIL_LIST_FRAGMENT] = f;
+				return f;
 			case FACEBOOK_FRIEND_LIST_FRAGMENT:
-				return new FacebookFriendListFragment();
+				if (fragments[FACEBOOK_FRIEND_LIST_FRAGMENT] != null) {
+					return fragments[FACEBOOK_FRIEND_LIST_FRAGMENT];
+				}
+				f = new FacebookFriendListFragment();
+				fragments[FACEBOOK_FRIEND_LIST_FRAGMENT] = f;
+				return f;
 			case TWITTER_FRIEND_LIST_FRAGMENT:
-				return new TwitterFriendListFragment2();
+				if (fragments[TWITTER_FRIEND_LIST_FRAGMENT] != null) {
+					return fragments[TWITTER_FRIEND_LIST_FRAGMENT];
+				}
+				f = new TwitterFriendListFragment2();
+				fragments[TWITTER_FRIEND_LIST_FRAGMENT] = f;
+				return f;
 			case LINKEDIN_CONTACT_LIST_FRAGMENT:
-				return new LinkedinContactListFragment();
+				if (fragments[LINKEDIN_CONTACT_LIST_FRAGMENT] != null) {
+					return fragments[LINKEDIN_CONTACT_LIST_FRAGMENT];
+				}
+				f = new LinkedinContactListFragment();
+				fragments[LINKEDIN_CONTACT_LIST_FRAGMENT] = f;
+				return f;
 			}
 		}
 

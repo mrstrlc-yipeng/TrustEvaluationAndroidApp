@@ -21,14 +21,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
 public class TrustIndexListFragment extends Fragment implements
-		OnItemClickListener {
+		OnItemClickListener, OnClickListener {
 
 	private static final String TAG = "TrustIndexListFragment";
 
@@ -40,6 +42,8 @@ public class TrustIndexListFragment extends Fragment implements
 	private TrustEvaluationDbHelper mDbHelper = null;
 
 	private List<MergedContactNode> contactNodeList;
+
+	private ListView trustIndexListView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -61,11 +65,19 @@ public class TrustIndexListFragment extends Fragment implements
 				container, false);
 
 		// list view
-		ListView trustIndexListView = (ListView) view
+		trustIndexListView = (ListView) view
 				.findViewById(R.id.trust_index_list);
 
+		updateListView();
+		
+		Button refreshButton = (Button) view.findViewById(R.id.refresh_button);
+		refreshButton.setOnClickListener(this);
+
+		return view;
+	}
+
+	private void updateListView() {
 		// data list
-		Log.v(TAG, "getting contact node list from db...");
 		contactNodeList = mDbHelper.getMergedContacts(sortOrder);
 
 		// set up adapter to display the trust index score
@@ -76,8 +88,7 @@ public class TrustIndexListFragment extends Fragment implements
 		// assign the adapter to the list view
 		trustIndexListView.setAdapter(mAdapter);
 		trustIndexListView.setOnItemClickListener(this);
-
-		return view;
+		trustIndexListView.invalidateViews();
 	}
 
 	@Override
@@ -144,6 +155,24 @@ public class TrustIndexListFragment extends Fragment implements
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
+		}
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.refresh_button:
+			// re-do calculate
+			if (mDbHelper == null) {
+				mDbHelper = new TrustEvaluationDbHelper(getActivity());
+			}
+			mDbHelper.calculateTrustIndex();
+			
+			// update list view
+			updateListView();
+			break;
+		default:
+			break;
 		}
 	}
 

@@ -10,15 +10,17 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ListView;
 import fr.utt.isi.tx.trustevaluationandroidapp.R;
 import fr.utt.isi.tx.trustevaluationandroidapp.adapters.ContactNodeListAdapter;
-import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationContactNode;
 import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDataContract;
+import fr.utt.isi.tx.trustevaluationandroidapp.database.TrustEvaluationDbHelper;
 import fr.utt.isi.tx.trustevaluationandroidapp.models.MergedContactNode;
 
-public class MatchingListFragment extends Fragment {
+public class MatchingListFragment extends Fragment implements OnClickListener {
 
 	private static final String TAG = "MatchingListFragment";
 
@@ -27,9 +29,11 @@ public class MatchingListFragment extends Fragment {
 	private String searchQuery = null;
 
 	private ContactNodeListAdapter adapter;
-	private TrustEvaluationContactNode contactNodeHelper;
+	private TrustEvaluationDbHelper mDbHelper;
 
 	private ListView mergedList;
+	
+	private int currentLayoutResourceId = R.layout.contact_node_list;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -41,9 +45,8 @@ public class MatchingListFragment extends Fragment {
 			searchQuery = intent.getStringExtra(SearchManager.QUERY);
 			Log.v(TAG, searchQuery);
 		}
-
-		if (contactNodeHelper == null)
-			contactNodeHelper = new TrustEvaluationContactNode(getActivity());
+		
+		mDbHelper = new TrustEvaluationDbHelper(getActivity());
 	}
 
 	@Override
@@ -63,6 +66,9 @@ public class MatchingListFragment extends Fragment {
 				R.layout.contact_node_list, getContactNodes());
 
 		mergedList.setAdapter(adapter);
+		
+		Button refreshButton = (Button) view.findViewById(R.id.refresh_button);
+		refreshButton.setOnClickListener(this);
 
 		return view;
 	}
@@ -72,16 +78,12 @@ public class MatchingListFragment extends Fragment {
 		super.onConfigurationChanged(newConfig);
 		if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
 			// change the list to complete layout with icon of platforms
-			adapter = new ContactNodeListAdapter(getActivity(),
-					R.layout.contact_node_complete_list, getContactNodes());
-			mergedList.setAdapter(adapter);
-			mergedList.invalidateViews();
+			updateListView(R.layout.contact_node_complete_list);
+			currentLayoutResourceId = R.layout.contact_node_complete_list;
 		} else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
 			// change back the list to simple layout
-			adapter = new ContactNodeListAdapter(getActivity(),
-					R.layout.contact_node_list, getContactNodes());
-			mergedList.setAdapter(adapter);
-			mergedList.invalidateViews();
+			updateListView(R.layout.contact_node_list);
+			currentLayoutResourceId = R.layout.contact_node_list;
 		} else {
 			Log.v(TAG, "others");
 		}
@@ -90,18 +92,35 @@ public class MatchingListFragment extends Fragment {
 	private List<MergedContactNode> getContactNodes() {
 		List<MergedContactNode> contactNodes;
 		if (searchQuery != null && searchQuery != "") {
-			// execute the search by "match" mechanism of FTS
-			String tableName = TrustEvaluationDataContract.ContactNode.VIRTUAL_TABLE_NAME;
+			String tableName = TrustEvaluationDataContract.ContactNode.TABLE_NAME;
 			String selection = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL
-					+ " MATCH ?";
-			String[] selectionArgs = new String[] { searchQuery };
-			contactNodes = contactNodeHelper.getMergedContacts(tableName,
+					+ " LIKE ?";
+			String[] selectionArgs = new String[] { "%" + searchQuery + "%" };
+			contactNodes = mDbHelper.getMergedContacts(tableName,
 					selection, selectionArgs, sortOrder);
 		} else {
-			contactNodes = contactNodeHelper.getMergedContacts(sortOrder);
+			contactNodes = mDbHelper.getMergedContacts(sortOrder);
 		}
 
 		return contactNodes;
+	}
+	
+	private void updateListView(int resourceId) {
+		adapter = new ContactNodeListAdapter(getActivity(),
+				resourceId, getContactNodes());
+		mergedList.setAdapter(adapter);
+		mergedList.invalidateViews();
+	}
+
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.refresh_button:
+			updateListView(currentLayoutResourceId);
+			break;
+		default:
+			break;
+		}
 	}
 
 }
