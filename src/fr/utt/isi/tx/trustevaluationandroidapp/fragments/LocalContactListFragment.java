@@ -12,12 +12,9 @@ import fr.utt.isi.tx.trustevaluationandroidapp.models.LocalContact;
 import fr.utt.isi.tx.trustevaluationandroidapp.tasks.MatchingTask;
 import fr.utt.isi.tx.trustevaluationandroidapp.utils.Utils;
 
-import android.app.Activity;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.Contacts;
@@ -38,9 +35,6 @@ public abstract class LocalContactListFragment extends Fragment implements
 	// database helper
 	private static TrustEvaluationDbHelper mDbHelper = null;
 
-	// context
-	private Context context;
-
 	// contact list view
 	private ListView contactListView;
 
@@ -48,12 +42,6 @@ public abstract class LocalContactListFragment extends Fragment implements
 	private Button updateButtonView;
 
 	public abstract int getContactType();
-
-	@Override
-	public void onAttach(Activity context) {
-		super.onAttach(context);
-		this.context = context;
-	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -80,7 +68,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 		ListContactSplittedActivity.mProgressDialog.show();
 
 		// execute the long running data retrieve task
-		new LongRunningDataRetrieve().execute(false);
+		settleContactList(false);
 	}
 
 	@Override
@@ -92,7 +80,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 			ListContactSplittedActivity.mProgressDialog.show();
 
 			// execute the long running data retrieve task
-			new LongRunningDataRetrieve().execute(true);
+			settleContactList(true);
 
 			// contactListView.setAdapter(new LocalContactArrayAdapter(context,
 			// R.layout.local_contact_list, getLocalContacts(
@@ -103,6 +91,22 @@ public abstract class LocalContactListFragment extends Fragment implements
 		}
 	}
 
+	private void settleContactList(boolean isForUpdate) {
+		List<LocalContact> contactList = getLocalContacts(getContactType(),
+				isForUpdate);
+
+		// set the list view
+		contactListView.setAdapter(new LocalContactListAdapter(getActivity(),
+				R.layout.local_contact_list, contactList));
+
+		// dismiss the progress dialog
+		ListContactSplittedActivity.mProgressDialog.dismiss();
+
+		// do matching in background
+		new MatchingTask(getActivity()).execute(getContactType());
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected List<LocalContact> getLocalContacts(int contactType,
 			boolean isForUpdate) {
 
@@ -113,10 +117,17 @@ public abstract class LocalContactListFragment extends Fragment implements
 		List<LocalContact> contacts = new ArrayList<LocalContact>();
 
 		if (!isForUpdate) {
+			if (ListContactSplittedActivity.contactLists.get(contactType) != null) {
+				return ListContactSplittedActivity.contactLists.get(contactType);
+			}
+			
 			// try to get contact list from database directly
+			Log.v(TAG, "loading contact from db...");
 			contacts = (ArrayList<LocalContact>) mDbHelper.getLocalContacts(
 					contactType, null);
 			if (contacts != null) {
+				Log.v(TAG, "finish loading");
+				ListContactSplittedActivity.contactLists.set(contactType, (ArrayList) contacts);
 				return contacts;
 			}
 		}
@@ -139,6 +150,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 		Log.v(TAG, "updating database...");
 		updateDatabase(contactType, contacts);
 
+		ListContactSplittedActivity.contactLists.set(contactType, (ArrayList) contacts);
 		return contacts;
 	}
 
@@ -148,7 +160,7 @@ public abstract class LocalContactListFragment extends Fragment implements
 		}
 
 		List<LocalContact> contacts = new ArrayList<LocalContact>();
-		ContentResolver cr = context.getContentResolver();
+		ContentResolver cr = getActivity().getContentResolver();
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null,
 				null, null, null);
 		if (cursor.getCount() > 0) {
@@ -252,34 +264,6 @@ public abstract class LocalContactListFragment extends Fragment implements
 			mDbHelper = new TrustEvaluationDbHelper(getActivity());
 		}
 		mDbHelper.insertLocalContact(contactType, contacts);
-	}
-
-	private class LongRunningDataRetrieve extends
-			AsyncTask<Boolean, Void, List<LocalContact>> {
-
-		@Override
-		protected List<LocalContact> doInBackground(Boolean... args) {
-			boolean isForUpdate = args[0];
-
-			return getLocalContacts(getContactType(), isForUpdate);
-		}
-
-		@Override
-		protected void onPostExecute(List<LocalContact> contactList) {
-			// set the list view
-			contactListView.setAdapter(new LocalContactListAdapter(context,
-					R.layout.local_contact_list, contactList));
-
-			// dismiss the progress dialog
-			ListContactSplittedActivity.mProgressDialog.dismiss();
-			
-			// do matching in background
-			new MatchingTask(getActivity()).execute(getContactType());
-		}
-	}
-
-	public Context getContext() {
-		return context;
 	}
 
 	public ListView getContactListView() {

@@ -76,9 +76,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 	}
 
 	public void clearTable(String tableName) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		String query = "DELETE FROM " + tableName;
 		Log.v(TAG, "deleting table " + tableName);
@@ -87,6 +85,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		statement.execute();
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 	}
 
 	public void clearDatabase() {
@@ -95,70 +94,8 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public boolean isContactInserted(int contactType, String contactId) {
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
-
-		String tableName;
-		String selection;
-		switch (contactType) {
-		case ListContactSplittedActivity.LOCAL_PHONE:
-			tableName = TrustEvaluationDataContract.LocalPhoneContact.TABLE_NAME;
-			selection = TrustEvaluationDataContract.LocalPhoneContact.COLUMN_NAME_LOCAL_ID
-					+ " = ?";
-			break;
-		case ListContactSplittedActivity.LOCAL_EMAIL:
-			tableName = TrustEvaluationDataContract.LocalEmailContact.TABLE_NAME;
-			selection = TrustEvaluationDataContract.LocalEmailContact.COLUMN_NAME_LOCAL_ID
-					+ " = ?";
-			break;
-		case ListContactSplittedActivity.FACEBOOK:
-			tableName = TrustEvaluationDataContract.FacebookContact.TABLE_NAME;
-			selection = TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID
-					+ " = ?";
-			break;
-		case ListContactSplittedActivity.TWITTER:
-			tableName = TrustEvaluationDataContract.TwitterContact.TABLE_NAME;
-			selection = TrustEvaluationDataContract.TwitterContact.COLUMN_NAME_TWITTER_ID
-					+ " = ?";
-			break;
-		case ListContactSplittedActivity.LINKEDIN:
-			tableName = TrustEvaluationDataContract.LinkedinContact.TABLE_NAME;
-			selection = TrustEvaluationDataContract.LinkedinContact.COLUMN_NAME_LINKEDIN_ID
-					+ " = ?";
-			break;
-		default:
-			// if contact type is undefined, just return true ( data row already
-			// inserted ) to avoid any insert transactions
-			return true;
-		}
-
-		// selection argument
-		String[] selectionArgs = { contactId };
-
-		// query
-		Cursor c = readable.query(tableName, null, selection, selectionArgs,
-				null, null, null);
-
-		boolean isInserted = false;
-		if (c.getCount() == 0) {
-			// no rows found
-			isInserted = false;
-		} else {
-			// rows found
-			isInserted = true;
-		}
-		c.close();
-
-		Log.v(TAG, "inserted? " + isInserted);
-		return isInserted;
-	}
-
 	public void insertLocalContact(int contactType, List<LocalContact> contacts) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		String tableName;
 		if (contactType == ListContactSplittedActivity.LOCAL_PHONE) {
@@ -176,23 +113,20 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<LocalContact> i = contacts.iterator();
 		while (i.hasNext()) {
 			LocalContact contact = i.next();
-			if (!isContactInserted(contactType, contact.getContactId())) {
-				statement.clearBindings();
-				statement.bindString(2, contact.getContactId());
-				statement.bindString(3, contact.getDisplayName());
-				statement.bindString(4, contact.getContactDetail());
-				statement.bindString(5, contact.getContactUri().toString());
-				statement.execute();
-			}
+			statement.clearBindings();
+			statement.bindString(2, contact.getContactId());
+			statement.bindString(3, contact.getDisplayName());
+			statement.bindString(4, contact.getContactDetail());
+			statement.bindString(5, contact.getContactUri().toString());
+			statement.execute();
 		}
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 	}
 
 	public List<LocalContact> getLocalContacts(int contactType, String sortOrder) {
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
+		readable = this.getReadableDatabase();
 
 		String tableName;
 		String[] columnNames = new String[4];
@@ -228,13 +162,13 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 		c.close();
 
+		readable.close();
+
 		return contacts;
 	}
 
 	public void insertTwitterContact(List<Contact> contacts) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.TwitterContact.TABLE_NAME
@@ -245,28 +179,24 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<Contact> i = contacts.iterator();
 		while (i.hasNext()) {
 			Contact contact = i.next();
-			if (!isContactInserted(ListContactSplittedActivity.TWITTER,
-					contact.getId())) {
-				statement.clearBindings();
-				statement.bindString(2, contact.getId());
-				// real display name
-				statement.bindString(3, contact.getFirstName());
-				// twitter user name
-				statement.bindString(4, contact.getDisplayName());
-				// profile image url
-				statement.bindString(5, contact.getProfileImageURL());
-				statement.execute();
-			}
+			statement.clearBindings();
+			statement.bindString(2, contact.getId());
+			// real display name
+			statement.bindString(3, contact.getFirstName());
+			// twitter user name
+			statement.bindString(4, contact.getDisplayName());
+			// profile image url
+			statement.bindString(5, contact.getProfileImageURL());
+			statement.execute();
 		}
 
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 	}
 
 	public List<Contact> getTwitterContacts(String sortOrder) {
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
+		readable = this.getReadableDatabase();
 
 		List<Contact> contacts = new ArrayList<Contact>();
 		Cursor c = readable.query(
@@ -290,13 +220,13 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 		c.close();
 
+		readable.close();
+
 		return contacts;
 	}
 
 	public void insertLinkedinContact(List<Contact> contacts) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.LinkedinContact.TABLE_NAME
@@ -307,31 +237,27 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<Contact> i = contacts.iterator();
 		while (i.hasNext()) {
 			Contact contact = i.next();
-			if (!isContactInserted(ListContactSplittedActivity.LINKEDIN,
-					contact.getId())) {
-				statement.clearBindings();
-				statement.bindString(2, contact.getId());
-				statement.bindString(3, contact.getFirstName());
-				statement.bindString(4, contact.getLastName());
-				// profile image url
-				String url = contact.getProfileImageURL();
-				if (url == null) {
-					statement.bindNull(5);
-				} else {
-					statement.bindString(5, contact.getProfileImageURL());
-				}
-				statement.execute();
+			statement.clearBindings();
+			statement.bindString(2, contact.getId());
+			statement.bindString(3, contact.getFirstName());
+			statement.bindString(4, contact.getLastName());
+			// profile image url
+			String url = contact.getProfileImageURL();
+			if (url == null) {
+				statement.bindNull(5);
+			} else {
+				statement.bindString(5, contact.getProfileImageURL());
 			}
+			statement.execute();
 		}
 
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 	}
 
 	public List<Contact> getLinkedinContacts(String sortOrder) {
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
+		readable = this.getReadableDatabase();
 
 		List<Contact> contacts = new ArrayList<Contact>();
 		Cursor c = readable.query(
@@ -355,13 +281,13 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 		c.close();
 
+		readable.close();
+
 		return contacts;
 	}
 
 	public void insertFacebookContacts(List<GraphUser> contacts) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		String query = "INSERT INTO "
 				+ TrustEvaluationDataContract.FacebookContact.TABLE_NAME
@@ -372,32 +298,28 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		Iterator<GraphUser> i = contacts.iterator();
 		while (i.hasNext()) {
 			GraphUser contact = i.next();
-			if (!isContactInserted(ListContactSplittedActivity.FACEBOOK,
-					contact.getId())) {
-				// get facebook id
-				String facebookId = contact.getId();
+			// get facebook id
+			String facebookId = contact.getId();
 
-				// form facebook profile picture url by facebook id
-				String facebookProfilePictureUrl = "http://graph.facebook.com/"
-						+ facebookId + "/picture";
+			// form facebook profile picture url by facebook id
+			String facebookProfilePictureUrl = "http://graph.facebook.com/"
+					+ facebookId + "/picture";
 
-				// do statement
-				statement.clearBindings();
-				statement.bindString(2, facebookId);
-				statement.bindString(3, contact.getName());
-				statement.bindString(4, facebookProfilePictureUrl);
-				statement.execute();
-			}
+			// do statement
+			statement.clearBindings();
+			statement.bindString(2, facebookId);
+			statement.bindString(3, contact.getName());
+			statement.bindString(4, facebookProfilePictureUrl);
+			statement.execute();
 		}
 
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 	}
 
 	public List<PseudoFacebookGraphUser> getFacebookContacts(String sortOrder) {
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
+		readable = this.getReadableDatabase();
 
 		List<PseudoFacebookGraphUser> contacts = new ArrayList<PseudoFacebookGraphUser>();
 		Cursor c = readable.query(
@@ -428,14 +350,14 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		}
 		c.close();
 
+		readable.close();
+
 		return contacts;
 	}
 
 	public void updateCommonFriendList(Map<String, String> commonFriendMap,
 			int contactType) {
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		// set the parameters of sql query depending on SNS type
 		String tableName;
@@ -483,66 +405,82 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 	}
-
+	
 	public List<MergedContactNode> getMergedContacts(String sortOrder) {
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
+		return getMergedContacts(TrustEvaluationDataContract.ContactNode.TABLE_NAME, null, null, sortOrder);
+	}
+	
+	public List<MergedContactNode> getMergedContacts(String tableName, String selection, String[] selectionArgs, String sortOrder) {
+		String displayName;
+		int sourceScore;
+		int trustScore;
+		int isLocalPhone;
+		int isLocalEmail;
+		int isFacebook;
+		int isTwitter;
+		int isLinkedin;
 
-		List<MergedContactNode> contactNodes = new ArrayList<MergedContactNode>();
+		readable = this.getReadableDatabase();
 
-		Cursor c = readable.query(
-				TrustEvaluationDataContract.ContactNode.TABLE_NAME, null, null,
-				null, null, null, sortOrder);
+		List<MergedContactNode> contacts = new ArrayList<MergedContactNode>();
+
+		Cursor c = readable.query(tableName, null, selection, selectionArgs, null, null,
+				sortOrder);
 		if (c.getCount() == 0) {
-			contactNodes = null;
+			contacts = null;
 		} else {
 			while (c.moveToNext()) {
-				MergedContactNode contactNode = new MergedContactNode();
-				contactNode
-						.setId(c.getString(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode._ID)));
-				contactNode
-						.setDisplayNameGlobal(c.getString(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL)));
-				contactNode
-						.setSourceScore(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_SOURCE_SCORE)));
-				contactNode
-						.setTrustScore(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE)));
-				contactNode
-						.setIsLocalPhone(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE)));
-				contactNode
-						.setIsLocalEmail(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL)));
-				contactNode
-						.setIsFacebook(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK)));
-				contactNode
-						.setIsTwitter(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER)));
-				contactNode
-						.setIsLinkedin(c.getInt(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN)));
-				contactNode
-						.setFacebookId(c.getString(c
-								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID)));
-				contactNodes.add(contactNode);
+				displayName = c
+						.getString(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL));
+				sourceScore = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_SOURCE_SCORE));
+				trustScore = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE));
+				isLocalPhone = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_PHONE));
+				isLocalEmail = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LOCAL_EMAIL));
+				isFacebook = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK));
+				isTwitter = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_TWITTER));
+				isLinkedin = c
+						.getInt(c
+								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN));
+
+				MergedContactNode contact = new MergedContactNode();
+				contact.setDisplayNameGlobal(displayName);
+				contact.setSourceScore(sourceScore);
+				contact.setTrustScore(trustScore);
+				contact.setIsLocalPhone(isLocalPhone);
+				contact.setIsLocalEmail(isLocalEmail);
+				contact.setIsFacebook(isFacebook);
+				contact.setIsTwitter(isTwitter);
+				contact.setIsLinkedin(isLinkedin);
+				contact.setFacebookId(c.getString(c
+						.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID)));
+				contacts.add(contact);
 			}
 		}
 		c.close();
+		
+		readable.close();
 
-		return contactNodes;
+		return contacts;
 
 	}
 
 	public void calculateTrustIndex() { // for now, facebook only
-		if (readable == null) {
-			readable = this.getReadableDatabase();
-		}
+		readable = this.getReadableDatabase();
 
 		// parameters for select query of common friend list strings
 		String tableName = TrustEvaluationDataContract.FacebookContact.TABLE_NAME;
@@ -563,9 +501,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			return;
 		}
 
-		if (writable == null) {
-			writable = this.getWritableDatabase();
-		}
+		writable = this.getWritableDatabase();
 
 		// statement for update query of trust index score
 		String query = "UPDATE "
@@ -654,19 +590,24 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		writable.setTransactionSuccessful();
 		writable.endTransaction();
+		writable.close();
 
 		c.close();
+
+		readable.close();
 	}
 
 	public void exportNodeContactTable(Context context) throws IOException {
 		StringBuilder mStringBuilder = new StringBuilder();
-		
+
 		// write the header
-		mStringBuilder.append("id,display_name_global,source_score,trust_score,is_local_phone,is_local_email,is_facebook,is_twitter,is_linkedin,facebook_id,\n");
-		
+		mStringBuilder
+				.append("id,display_name_global,source_score,trust_score,is_local_phone,is_local_email,is_facebook,is_twitter,is_linkedin,facebook_id,\n");
+
 		// get contact node list from db
-		List<MergedContactNode> contactNodes = getMergedContacts(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE + " DESC");
-		
+		List<MergedContactNode> contactNodes = getMergedContacts(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE
+				+ " DESC");
+
 		for (int i = 0; i < contactNodes.size(); i++) {
 			MergedContactNode contactNode = contactNodes.get(i);
 			mStringBuilder.append(contactNode.getId());
@@ -687,12 +628,13 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			mStringBuilder.append(",");
 			mStringBuilder.append(contactNode.getIsLinkedin());
 			mStringBuilder.append(",");
-			//mStringBuilder.append("\"" + contactNode.getFacebookId() + "\"");
-			//mStringBuilder.append(",");
+			// mStringBuilder.append("\"" + contactNode.getFacebookId() + "\"");
+			// mStringBuilder.append(",");
 			mStringBuilder.append("\n");
 		}
-		
-		FileOutputStream fos = context.openFileOutput(Config.EXPORT_FILE_NAME, Context.MODE_WORLD_READABLE);
+
+		FileOutputStream fos = context.openFileOutput(Config.EXPORT_FILE_NAME,
+				Context.MODE_WORLD_READABLE);
 		fos.write(mStringBuilder.toString().getBytes());
 		fos.close();
 	}

@@ -14,11 +14,11 @@ public class Config {
 	public static final String PREF_IS_FIRST_VISIT_LINKEDIN = "is_first_visit_linkedin";
 	
 	// export configs
-	public static final String EXPORT_FILE_NAME = "db_export.csv";
+	public static final String EXPORT_FILE_NAME = "trust_evaluation_db_export.csv";
 	
 	// mailing configs
-	public static final String EMAIL_DESTINATION = "huang.ypeng@gmail.com";
-	public static final String EMAIL_SUJECT = "db export";
+	public static final String EMAIL_DESTINATION = "charles.perez@utt.fr";
+	public static final String EMAIL_SUJECT = "trust evaluation db export";
 	public static final String EMAIL_BODY = "";
 	
 	private Config() {

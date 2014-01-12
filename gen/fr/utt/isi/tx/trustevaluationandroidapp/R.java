@@ -1214,12 +1214,12 @@ containing a value of this type.
         public static final int action_bar_subtitle=0x7f060025;
         public static final int action_bar_title=0x7f060024;
         public static final int action_context_bar=0x7f06001f;
-        public static final int action_export=0x7f06006f;
+        public static final int action_export=0x7f060070;
         public static final int action_menu_divider=0x7f060018;
         public static final int action_menu_presenter=0x7f060019;
         public static final int action_mode_close_button=0x7f060026;
-        public static final int action_search=0x7f060071;
-        public static final int action_settings=0x7f060070;
+        public static final int action_search=0x7f060072;
+        public static final int action_settings=0x7f060071;
         public static final int activity_chooser_view_content=0x7f060027;
         public static final int always=0x7f06000d;
         public static final int beginning=0x7f060013;
@@ -1249,9 +1249,9 @@ containing a value of this type.
         public static final int com_facebook_usersettingsfragment_logo_image=0x7f060056;
         public static final int com_facebook_usersettingsfragment_profile_name=0x7f060057;
         public static final int contactEntryText=0x7f060059;
-        public static final int contact_display_name=0x7f06006e;
-        public static final int contact_image=0x7f06006b;
-        public static final int contact_name=0x7f06006c;
+        public static final int contact_display_name=0x7f06006f;
+        public static final int contact_image=0x7f06006c;
+        public static final int contact_name=0x7f06006d;
         public static final int contact_name_global=0x7f06005a;
         public static final int default_activity_button=0x7f06002a;
         public static final int dialog=0x7f060010;
@@ -1291,8 +1291,9 @@ containing a value of this type.
         public static final int profile_picture=0x7f060061;
         public static final int progress_circular=0x7f06001a;
         public static final int progress_horizontal=0x7f06001b;
-        public static final int quick_contact_badge=0x7f06006d;
+        public static final int quick_contact_badge=0x7f06006e;
         public static final int radio=0x7f060031;
+        public static final int refresh_button=0x7f060069;
         public static final int search_badge=0x7f060034;
         public static final int search_bar=0x7f060033;
         public static final int search_button=0x7f060035;
@@ -1314,8 +1315,8 @@ containing a value of this type.
         public static final int tabMode=0x7f060004;
         public static final int title=0x7f06002d;
         public static final int top_action_bar=0x7f060022;
-        public static final int trust_index_list=0x7f060069;
-        public static final int twitter_friend_list=0x7f06006a;
+        public static final int trust_index_list=0x7f06006a;
+        public static final int twitter_friend_list=0x7f06006b;
         public static final int up=0x7f060023;
         public static final int update_button=0x7f060065;
         public static final int useLogo=0x7f060005;
@@ -1450,11 +1451,11 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abc_shareactionprovider_share_with_application=0x7f090024;
-        public static final int action_export=0x7f090038;
+        public static final int action_export=0x7f090039;
         /**  action bar 
          */
-        public static final int action_search=0x7f090035;
-        public static final int action_settings=0x7f090036;
+        public static final int action_search=0x7f090036;
+        public static final int action_settings=0x7f090037;
         /**  contact list fragments 
          */
         public static final int app_id=0x7f09002f;
@@ -1464,6 +1465,7 @@ containing a value of this type.
         public static final int button_list_1=0x7f090028;
         public static final int button_list_2=0x7f090029;
         public static final int button_list_3=0x7f09002a;
+        public static final int button_refresh=0x7f090035;
         public static final int button_update=0x7f090033;
         public static final int com_facebook_choose_friends=0x7f09000f;
         public static final int com_facebook_dialogloginactivity_ok_button=0x7f090000;
@@ -1500,9 +1502,9 @@ containing a value of this type.
         public static final int logout=0x7f090034;
         /**  search 
          */
-        public static final int search_hint=0x7f090039;
-        public static final int settings=0x7f090037;
-        public static final int title_activity_searchable=0x7f09003a;
+        public static final int search_hint=0x7f09003a;
+        public static final int settings=0x7f090038;
+        public static final int title_activity_searchable=0x7f09003b;
         public static final int twitter_login_button_text=0x7f090031;
     }
     public static final class style {
