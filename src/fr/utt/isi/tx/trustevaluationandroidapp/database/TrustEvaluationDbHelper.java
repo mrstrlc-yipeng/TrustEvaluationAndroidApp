@@ -3,6 +3,7 @@ package fr.utt.isi.tx.trustevaluationandroidapp.database;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
 import android.net.Uri;
 import android.util.Log;
+import android.util.SparseArray;
 
 public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
@@ -407,13 +409,17 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		writable.endTransaction();
 		writable.close();
 	}
-	
+
 	public List<MergedContactNode> getMergedContacts(String sortOrder) {
-		return getMergedContacts(TrustEvaluationDataContract.ContactNode.TABLE_NAME, null, null, sortOrder);
+		return getMergedContacts(
+				TrustEvaluationDataContract.ContactNode.TABLE_NAME, null, null,
+				sortOrder);
 	}
-	
-	public List<MergedContactNode> getMergedContacts(String tableName, String selection, String[] selectionArgs, String sortOrder) {
+
+	public List<MergedContactNode> getMergedContacts(String tableName,
+			String selection, String[] selectionArgs, String sortOrder) {
 		String displayName;
+		int id;
 		int sourceScore;
 		int trustScore;
 		int isLocalPhone;
@@ -426,12 +432,14 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		List<MergedContactNode> contacts = new ArrayList<MergedContactNode>();
 
-		Cursor c = readable.query(tableName, null, selection, selectionArgs, null, null,
-				sortOrder);
+		Cursor c = readable.query(tableName, null, selection, selectionArgs,
+				null, null, sortOrder);
 		if (c.getCount() == 0) {
 			contacts = null;
 		} else {
 			while (c.moveToNext()) {
+				id = c.getInt(c
+						.getColumnIndex(TrustEvaluationDataContract.ContactNode._ID));
 				displayName = c
 						.getString(c
 								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_DISPLAY_NAME_GLOBAL));
@@ -458,6 +466,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 								.getColumnIndex(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_LINKEDIN));
 
 				MergedContactNode contact = new MergedContactNode();
+				contact.setId(String.valueOf(id));
 				contact.setDisplayNameGlobal(displayName);
 				contact.setSourceScore(sourceScore);
 				contact.setTrustScore(trustScore);
@@ -472,7 +481,7 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			}
 		}
 		c.close();
-		
+
 		readable.close();
 
 		return contacts;
@@ -597,12 +606,97 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 		readable.close();
 	}
 
+	public int getContactNodeIdByFacebookId(String facebookId) {
+		readable = this.getReadableDatabase();
+
+		String tableName = TrustEvaluationDataContract.ContactNode.TABLE_NAME;
+		String[] columns = new String[] { TrustEvaluationDataContract.ContactNode._ID };
+		String selection = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID
+				+ " = ?";
+		String[] selectionArgs = new String[] { facebookId };
+
+		Cursor c = readable.query(tableName, columns, selection, selectionArgs,
+				null, null, null);
+
+		int contactNodeId = 0;
+
+		if (c.moveToNext()) {
+			contactNodeId = c.getInt(0);
+		}
+
+		// readable.close();
+
+		return contactNodeId;
+	}
+
+	public SparseArray<String> getFacebookCommonFriendsContactNodeIds() {
+		SparseArray<String> map = new SparseArray<String>();
+
+		readable = this.getReadableDatabase();
+
+		// get all facebook contacts and their common friend list
+		String tableName = TrustEvaluationDataContract.FacebookContact.TABLE_NAME;
+		String[] columns = new String[] {
+				TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID,
+				TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST };
+
+		Cursor c = readable.query(tableName, columns, null, null, null, null,
+				null);
+
+		while (c.moveToNext()) {
+			String facebookId = c
+					.getString(c
+							.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_ID));
+			String[] facebookCommonFriendList = c
+					.getString(
+							c.getColumnIndex(TrustEvaluationDataContract.FacebookContact.COLUMN_NAME_FACEBOOK_COMMON_FRIEND_LIST))
+					.split(";");
+
+			// build query
+			tableName = TrustEvaluationDataContract.ContactNode.TABLE_NAME;
+			columns = new String[] { TrustEvaluationDataContract.ContactNode._ID };
+			// build selection
+			StringBuilder selectionBuilder = new StringBuilder();
+			for (int i = 0; i < facebookCommonFriendList.length; i++) {
+				selectionBuilder
+						.append(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_FACEBOOK_ID
+								+ " = ?");
+				if (i != facebookCommonFriendList.length - 1) {
+					selectionBuilder.append(" OR ");
+				}
+			}
+			String selection = selectionBuilder.toString();
+			String[] selectionArgs = facebookCommonFriendList;
+
+			Cursor cContactNodes = readable.query(tableName, columns,
+					selection, selectionArgs, null, null, null);
+
+			StringBuilder idBuilder = new StringBuilder();
+			while (cContactNodes.moveToNext()) {
+				idBuilder.append(cContactNodes.getInt(0));
+				idBuilder.append(";");
+			}
+
+			cContactNodes.close();
+
+			int id = getContactNodeIdByFacebookId(facebookId);
+
+			map.put(id, idBuilder.toString());
+		}
+
+		readable.close();
+
+		return map;
+	}
+
 	public void exportNodeContactTable(Context context) throws IOException {
+		SparseArray<String> facebookRelationMap = getFacebookCommonFriendsContactNodeIds();
+
 		StringBuilder mStringBuilder = new StringBuilder();
 
 		// write the header
 		mStringBuilder
-				.append("id,display_name_global,source_score,trust_score,is_local_phone,is_local_email,is_facebook,is_twitter,is_linkedin,facebook_id,\n");
+				.append("id,source_score,trust_score,is_local_phone,is_local_email,is_facebook,is_twitter,is_linkedin,\n");
 
 		// get contact node list from db
 		List<MergedContactNode> contactNodes = getMergedContacts(TrustEvaluationDataContract.ContactNode.COLUMN_NAME_TRUST_SCORE
@@ -610,9 +704,11 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 
 		for (int i = 0; i < contactNodes.size(); i++) {
 			MergedContactNode contactNode = contactNodes.get(i);
+			if (contactNode.getIsFacebook() == 0) {
+				// if contact not detected on facebook, don't export
+				continue;
+			}
 			mStringBuilder.append(contactNode.getId());
-			mStringBuilder.append(",");
-			mStringBuilder.append(contactNode.getDisplayNameGlobal());
 			mStringBuilder.append(",");
 			mStringBuilder.append(contactNode.getSourceScore());
 			mStringBuilder.append(",");
@@ -628,9 +724,22 @@ public class TrustEvaluationDbHelper extends SQLiteOpenHelper {
 			mStringBuilder.append(",");
 			mStringBuilder.append(contactNode.getIsLinkedin());
 			mStringBuilder.append(",");
-			// mStringBuilder.append("\"" + contactNode.getFacebookId() + "\"");
-			// mStringBuilder.append(",");
 			mStringBuilder.append("\n");
+		}
+
+		mStringBuilder.append("\n");
+		mStringBuilder.append("Couples facebook\n");
+		for (int i = 0; i < facebookRelationMap.size(); i++) {
+			int key = facebookRelationMap.keyAt(i);
+			String[] ids = facebookRelationMap.get(key).split(";");
+			if (key != 0 && ids.length > 0 && ids[0] != "") {
+				for (int j = 0; j < ids.length; j++) {
+					mStringBuilder.append(key);
+					mStringBuilder.append(",");
+					mStringBuilder.append(ids[j]);
+					mStringBuilder.append("\n");
+				}
+			}
 		}
 
 		FileOutputStream fos = context.openFileOutput(Config.EXPORT_FILE_NAME,
