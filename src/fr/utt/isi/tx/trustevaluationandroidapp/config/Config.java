@@ -18,6 +18,7 @@ public class Config {
 	
 	// mailing configs
 	public static final String EMAIL_DESTINATION = "charles.perez@utt.fr";
+	//public static final String EMAIL_DESTINATION = "huang.ypeng@gmail.com";
 	public static final String EMAIL_SUJECT = "trust evaluation db export";
 	public static final String EMAIL_BODY = "";
 	

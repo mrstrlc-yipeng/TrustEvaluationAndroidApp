@@ -78,7 +78,10 @@ public class TrustIndexListFragment extends Fragment implements
 
 	private void updateListView() {
 		// data list
-		contactNodeList = mDbHelper.getMergedContacts(sortOrder);
+		String tableName = TrustEvaluationDataContract.ContactNode.TABLE_NAME;
+		String selection = TrustEvaluationDataContract.ContactNode.COLUMN_NAME_IS_FACEBOOK + "= ?";
+		String[] selectionArgs = new String[] {String.valueOf(1)};
+		contactNodeList = mDbHelper.getMergedContacts(tableName, selection, selectionArgs, sortOrder);
 
 		// set up adapter to display the trust index score
 		ContactNodeListAdapter mAdapter = new ContactNodeListAdapter(

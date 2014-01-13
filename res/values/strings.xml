@@ -2,15 +2,14 @@
 <resources>
 
     <!-- app basic -->
-    <string name="app_name">Trust Evaluation Android App</string>
-    <string name="development_env">Development Environment</string>
+    <string name="app_name">Mobile Socializer</string>
     <string name="button_list_1">Contacts</string>
     <string name="button_list_2">Overlap</string>
-    <string name="button_list_3">WRA index</string>
-    <string name="label_main">Dev</string>
+    <string name="button_list_3">Trust scores</string>
+    <string name="label_main">Main menu</string>
     <string name="label_splitted">Contacts</string>
     <string name="label_merged">Overlap</string>
-    <string name="label_indexed">WRA index</string>
+    <string name="label_indexed">Trust scores</string>
 
     <!-- contact list fragments -->
     <string name="app_id">394447740658300</string>

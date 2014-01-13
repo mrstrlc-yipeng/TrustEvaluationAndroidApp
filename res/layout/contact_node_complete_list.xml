@@ -16,28 +16,33 @@
     
     <ImageView
         android:id="@+id/is_local_phone"
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
         android:padding="5dp" />
     <ImageView
         android:id="@+id/is_local_email"
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
         android:padding="5dp" />
     <ImageView
         android:id="@+id/is_facebook"
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
         android:padding="5dp" />
     <ImageView
         android:id="@+id/is_twitter"
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
         android:padding="5dp" />
     <ImageView
         android:id="@+id/is_linkedin"
-        android:layout_width="40dp"
-        android:layout_height="fill_parent"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_vertical"
         android:padding="5dp" />
 
     <TextView
